@@ -6,147 +6,25 @@
   <title>Sakura Season – Catch the Petals</title>
 
   <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background: radial-gradient(circle at top, #ffe8f2, #fff);
-      color: #111;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .card {
-      width: min(520px, calc(100vw - 24px));
-      background: rgba(255,255,255,0.92);
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      overflow: hidden;
-    }
-
-    header {
-      padding: 18px;
-      text-align: center;
-    }
-
-    h1 {
-      margin: 0 0 6px;
-      font-size: 18px;
-      user-select: none;
-    }
-
-    p {
-      margin: 0;
-      font-size: 14px;
-      opacity: 0.75;
-      line-height: 1.4;
-    }
-
-    .stageWrap {
-      padding: 0 18px 18px;
-    }
-
-    #stage {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 9 / 14;
-      background: linear-gradient(180deg, #ffd7e8, #fff);
-      border-radius: 18px;
-      overflow: hidden;
-      touch-action: manipulation;
-    }
-
-    .hud {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      right: 10px;
-      display: flex;
-      justify-content: space-between;
-      z-index: 2;
-    }
-
-    .pill {
-      background: rgba(255,255,255,0.85);
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .center {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      padding: 18px;
-      z-index: 3;
-    }
-
-    .stack {
-      display: grid;
-      gap: 12px;
-      justify-items: center;
-    }
-
-    .btn {
-      border: none;
-      border-radius: 14px;
-      padding: 12px 16px;
-      font-weight: 800;
-      font-size: 15px;
-      width: min(280px, 100%);
-      cursor: pointer;
-    }
-
-    .btn.primary {
-      background: #111;
-      color: #fff;
-    }
-
-    .btn.secondary {
-      background: #fff;
-      border: 1px solid rgba(0,0,0,0.15);
-    }
-
-    .small {
-      font-size: 12px;
-      opacity: 0.7;
-      line-height: 1.4;
-    }
-
-    .petal {
-      position: absolute;
-      width: 36px;
-      height: 36px;
-      transform: translate(-50%, -50%);
-      border-radius: 12px 18px;
-      background: radial-gradient(circle at 30% 30%, #fff, #ff9fc7);
-      box-shadow: 0 6px 14px rgba(255,120,170,0.25);
-      user-select: none;
-    }
-
-    .toast {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      right: 10px;
-      text-align: center;
-      font-size: 12px;
-      opacity: 0.85;
-      z-index: 4;
-    }
-
-    .code {
-      margin-top: 8px;
-      padding: 8px 12px;
-      border-radius: 10px;
-      background: rgba(0,0,0,0.06);
-      font-family: monospace;
-      font-weight: 800;
-    }
+    body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:radial-gradient(circle at top,#ffe8f2,#fff); color:#111; min-height:100vh; display:flex; align-items:center; justify-content:center; }
+    .card { width:min(520px,calc(100vw - 24px)); background:rgba(255,255,255,0.92); border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.1); overflow:hidden; }
+    header { padding:18px; text-align:center; }
+    h1 { margin:0 0 6px; font-size:18px; user-select:none; }
+    p { margin:0; font-size:14px; opacity:0.75; line-height:1.4; }
+    .stageWrap { padding:0 18px 18px; }
+    #stage { position:relative; width:100%; aspect-ratio:9/14; background:linear-gradient(180deg,#ffd7e8,#fff); border-radius:18px; overflow:hidden; touch-action:manipulation; }
+    .hud { position:absolute; top:10px; left:10px; right:10px; display:flex; justify-content:space-between; z-index:2; }
+    .pill { background:rgba(255,255,255,0.85); padding:8px 10px; border-radius:999px; font-size:13px; font-weight:800; }
+    .center { position:absolute; inset:0; display:grid; place-items:center; text-align:center; padding:18px; z-index:3; }
+    .stack { display:grid; gap:12px; justify-items:center; }
+    .btn { border:none; border-radius:14px; padding:12px 16px; font-weight:900; font-size:15px; width:min(280px,100%); cursor:pointer; }
+    .btn.primary { background:#111; color:#fff; }
+    .btn.secondary { background:#fff; border:1px solid rgba(0,0,0,0.15); color:#111; }
+    .small { font-size:12px; opacity:0.7; line-height:1.4; }
+    .petal { position:absolute; width:36px; height:36px; transform:translate(-50%,-50%); border-radius:12px 18px; background:radial-gradient(circle at 30% 30%,#fff,#ff9fc7); box-shadow:0 6px 14px rgba(255,120,170,0.25); user-select:none; }
+    .toast { position:absolute; bottom:10px; left:10px; right:10px; text-align:center; font-size:12px; opacity:0.9; z-index:4; }
+    .code { margin-top:8px; padding:10px 12px; border-radius:10px; background:rgba(0,0,0,0.06); font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-weight:900; letter-spacing:.3px; }
+    .warn { color:#b00020; font-weight:900; }
   </style>
 </head>
 
@@ -158,10 +36,13 @@
       <p class="small" style="margin-top:6px;">
         Prizes: <b>15–30</b> Miso Soup • <b>31–50</b> Miso Soup + Soft Drink • <b>51+</b> A Meal
       </p>
+      <p class="small" style="margin-top:6px;">
+        Server-validated demo (vouchers created by backend).
+      </p>
     </header>
 
     <div class="stageWrap">
-      <div id="stage">
+      <div id="stage" aria-label="Game area">
         <div class="hud">
           <div class="pill">⏱ <span id="time">15.0</span>s</div>
           <div class="pill">🌸 Petals: <span id="score">0</span></div>
@@ -171,9 +52,10 @@
           <div class="stack">
             <div>
               <div style="font-weight:900;font-size:18px;">Ready?</div>
-              <div class="small">One play per day (per device)</div>
+              <div class="small" id="playInfo">Checking eligibility…</div>
+              <div class="small warn" id="errBox" style="display:none;"></div>
             </div>
-            <button class="btn primary" id="startBtn">Start</button>
+            <button class="btn primary" id="startBtn" disabled>Start</button>
             <button class="btn secondary" id="howBtn">How it works</button>
           </div>
         </div>
@@ -183,27 +65,45 @@
     </div>
   </div>
 
+  <!-- Firebase Web SDK (CDN, compatible with plain HTML) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-functions-compat.js"></script>
+
 <script>
 (() => {
+  // =========================
+  // FIREBASE CONFIG (YOUR PROJECT)
+  // =========================
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKwvSkOByJQk2F0fPj1Q3lGRmrC4MdRTk",
+    authDomain: "sakura-game-e22d2.firebaseapp.com",
+    projectId: "sakura-game-e22d2",
+    appId: "1:693002131028:web:782d316dbba21fd0143fc1"
+  };
+
+  // Must match Functions region in backend code:
+  const FUNCTIONS_REGION = "europe-west2"; // London
+
+  // =========================
+  // GAME CONFIG
+  // =========================
   const GAME_SECONDS = 15;
   const SPAWN_PER_SEC = 2.3;
   const SPEED_MIN = 120;
   const SPEED_MAX = 260;
-  const DAILY_LIMIT = 1;
 
-  function rewardForScore(score) {
-    if (score >= 51) {
-      return { won: true, label: "A Meal", code: "YMS-SAKURA-MEAL" };
-    }
-    if (score >= 31) {
-      return { won: true, label: "Miso Soup + Soft Drink", code: "YMS-SAKURA-MISO-DRINK" };
-    }
-    if (score >= 15) {
-      return { won: true, label: "Miso Soup", code: "YMS-SAKURA-MISO" };
-    }
-    return { won: false };
+  // Reward rules (Option B)
+  function rewardTier(score){
+    if (score >= 51) return { tier: 3, label: "A Meal" };
+    if (score >= 31) return { tier: 2, label: "Miso Soup + Soft Drink" };
+    if (score >= 15) return { tier: 1, label: "Miso Soup" };
+    return { tier: 0, label: "No prize" };
   }
 
+  // =========================
+  // DOM
+  // =========================
   const stage = document.getElementById("stage");
   const overlay = document.getElementById("overlay");
   const startBtn = document.getElementById("startBtn");
@@ -211,31 +111,85 @@
   const scoreEl = document.getElementById("score");
   const timeEl = document.getElementById("time");
   const toastEl = document.getElementById("toast");
+  const playInfo = document.getElementById("playInfo");
+  const errBox = document.getElementById("errBox");
+  const title = document.getElementById("secretTitle");
 
+  // =========================
+  // STATE
+  // =========================
   let running = false, score = 0, time = GAME_SECONDS;
   let petals = [], last = null, spawnAcc = 0;
+  let canPlayNow = false;
 
-  const todayKey = () => new Date().toISOString().slice(0,10);
-  const playsKey = () => "sakuraPlays:" + todayKey();
-
-  function canPlay() {
-    return (localStorage.getItem(playsKey()) || "0") < DAILY_LIMIT;
+  // =========================
+  // Firebase init
+  // =========================
+  let auth, functions;
+  try {
+    firebase.initializeApp(firebaseConfig);
+    auth = firebase.auth();
+    functions = firebase.app().functions(FUNCTIONS_REGION);
+  } catch (e) {
+    showError("Firebase init failed. Check firebaseConfig.");
+    playInfo.textContent = "Unable to start.";
+    return;
   }
 
-  function markPlayed() {
-    localStorage.setItem(playsKey(), "1");
+  function showError(msg){
+    errBox.style.display = "block";
+    errBox.textContent = msg;
+  }
+  function clearError(){
+    errBox.style.display = "none";
+    errBox.textContent = "";
   }
 
+  async function ensureAuth(){
+    if (auth.currentUser) return auth.currentUser;
+    await auth.signInAnonymously();
+    return auth.currentUser;
+  }
+
+  async function refreshEligibility(){
+    clearError();
+    startBtn.disabled = true;
+    playInfo.textContent = "Checking eligibility…";
+
+    try {
+      await ensureAuth();
+      const canPlayFn = functions.httpsCallable("canPlay");
+      const res = await canPlayFn({});
+      canPlayNow = !!res.data?.canPlay;
+
+      if (canPlayNow) {
+        playInfo.textContent = "You can play now. Good luck 🌸";
+        startBtn.disabled = false;
+      } else {
+        playInfo.textContent = "You already played today OR you have an unclaimed prize. Redeem first / try again tomorrow.";
+        startBtn.disabled = true;
+      }
+    } catch (e) {
+      showError("Server check failed. Deploy Functions and ensure Anonymous Auth is enabled.");
+      playInfo.textContent = "Unable to verify right now.";
+    }
+  }
+
+  // =========================
+  // PETALS
+  // =========================
   function spawnPetal() {
     const rect = stage.getBoundingClientRect();
     const el = document.createElement("div");
     el.className = "petal";
+
     const p = {
       el,
       x: Math.random() * rect.width,
       y: -20,
       speed: SPEED_MIN + Math.random() * (SPEED_MAX - SPEED_MIN)
     };
+
     el.style.left = p.x + "px";
     el.style.top = p.y + "px";
     stage.appendChild(el);
@@ -243,9 +197,9 @@
     el.addEventListener("pointerdown", () => {
       if (!running) return;
       score++;
-      scoreEl.textContent = score;
+      scoreEl.textContent = String(score);
       toastEl.textContent = "🌸 +1";
-      setTimeout(() => toastEl.textContent = "", 300);
+      setTimeout(() => toastEl.textContent = "", 250);
       el.remove();
       petals = petals.filter(x => x !== p);
     });
@@ -256,6 +210,7 @@
   function loop(ts) {
     if (!running) return;
     if (!last) last = ts;
+
     const dt = Math.min(0.033, (ts - last) / 1000);
     last = ts;
 
@@ -279,72 +234,106 @@
     else requestAnimationFrame(loop);
   }
 
-  function startGame() {
-    if (!canPlay()) {
-      alert("You have already played today. Try again tomorrow 🌸");
-      return;
+  async function startGame() {
+    clearError();
+
+    if (!canPlayNow) {
+      await refreshEligibility();
+      if (!canPlayNow) return;
     }
-    markPlayed();
+
     running = true;
     score = 0;
     time = GAME_SECONDS;
     last = null;
     spawnAcc = 0;
+
     petals.forEach(p => p.el.remove());
     petals = [];
+
     scoreEl.textContent = "0";
     overlay.style.display = "none";
+
     requestAnimationFrame(loop);
   }
 
-  function endGame() {
+  async function endGame() {
     running = false;
+
     petals.forEach(p => p.el.remove());
     petals = [];
 
-    const reward = rewardForScore(score);
+    // Client-side tier for display; server decides voucher minting
+    rewardTier(score);
+
+    let serverResult = null;
+    try {
+      await ensureAuth();
+      const finishFn = functions.httpsCallable("finishGame");
+      const res = await finishFn({ score });
+      serverResult = res.data || null;
+    } catch (e) {
+      serverResult = { ok:false, message:"Could not reach server to create voucher. Please try again." };
+    }
 
     overlay.style.display = "grid";
+
+    if (!serverResult?.ok) {
+      overlay.innerHTML = `
+        <div class="stack">
+          <div style="font-weight:900;font-size:18px;">Time!</div>
+          <div>🌸 Your score: <b>${score}</b></div>
+          <div class="small warn">Server error: ${serverResult?.message || "Unknown error"}</div>
+          <button class="btn primary" onclick="location.reload()">Close</button>
+        </div>
+      `;
+      return;
+    }
+
+    const prize = serverResult.prize;
+
     overlay.innerHTML = `
       <div class="stack">
         <div style="font-weight:900;font-size:18px;">Time!</div>
         <div>🌸 Your score: <b>${score}</b></div>
+
         ${
-          reward.won
-          ? `<div><b>You won:</b> ${reward.label}<div class="code">${reward.code}</div></div>`
-          : `<div><b>No prize today</b><br/><span class="small">Try again tomorrow 🌸</span></div>`
+          prize
+            ? `<div><b>You won:</b> ${prize.label}<div class="code">${prize.code}</div></div>
+               <div class="small">Show this code at the counter to redeem.</div>
+               <div class="small">Rule: one prize at a time. Prizes cannot be stacked.</div>`
+            : `<div><b>No prize today</b><br/><span class="small">Try again tomorrow 🌸</span></div>`
         }
-        <div class="small">One prize at a time. Prizes cannot be stacked.</div>
+
         <button class="btn primary" onclick="location.reload()">Done</button>
       </div>
     `;
   }
 
-  startBtn.onclick = startGame;
   howBtn.onclick = () => alert(
 `How it works:
-• Tap petals to score
-• 15–30: Miso Soup
-• 31–50: Miso Soup + Soft Drink
-• 51+: A Meal
-• One play per day
-• One prize at a time`
+• Tap petals to score in 15 seconds.
+• Prizes:
+  - 15–30: Miso Soup
+  - 31–50: Miso Soup + Soft Drink
+  - 51+: A Meal
+• One play per day (server-validated)
+• One prize at a time (server-validated)`
   );
 
-  // ===== SECRET STAFF ACCESS (HOLD TITLE 3s) =====
-  const title = document.getElementById("secretTitle");
+  startBtn.onclick = startGame;
+
+  // Secret staff access: hold title 3s -> redeem.html
   let pressTimer = null;
-
   title.addEventListener("pointerdown", () => {
-    pressTimer = setTimeout(() => {
-      window.location.href = "redeem.html";
-    }, 3000);
+    pressTimer = setTimeout(() => window.location.href = "redeem.html", 3000);
   });
-
   ["pointerup","pointerleave","pointercancel"].forEach(evt =>
     title.addEventListener(evt, () => clearTimeout(pressTimer))
   );
 
+  // Boot
+  refreshEligibility();
 })();
 </script>
 </body>
