@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>You Me Sushi – Sakura Season (Staff Redeem)</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: radial-gradient(circle at top, #ffe8f2, #ffffff);
+      color:#111;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+    .card{
+      width:min(720px, 100%);
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.10);
+      overflow:hidden;
+    }
+    header{ padding:18px 18px 12px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    h1{ margin:0 0 6px; font-size:18px; }
+    p{ margin:0; font-size:13px; opacity:.75; line-height:1.4; }
+
+    .content{ padding:18px; display:grid; gap:14px; }
+    .row{ display:grid; gap:8px; }
+    label{ font-size:12px; font-weight:800; opacity:.8; }
+    input, select{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,0.14);
+      background:#fff;
+      font-size:14px;
+      outline:none;
+    }
+    input:focus, select:focus{ border-color: rgba(0,0,0,0.35); }
+
+    .btnRow{ display:flex; gap:10px; flex-wrap:wrap; }
+    button{
+      border:0;
+      border-radius:14px;
+      padding:12px 14px;
+      font-weight:900;
+      cursor:pointer;
+      font-size:14px;
+    }
+    .primary{ background:#111; color:#fff; }
+    .secondary{ background:#fff; border:1px solid rgba(0,0,0,0.14); color:#111; }
+    .danger{ background:#b00020; color:#fff; }
+
+    .panel{
+      border-radius:16px;
+      border:1px solid rgba(0,0,0,0.08);
+      background: rgba(0,0,0,0.03);
+      padding:14px;
+    }
+
+    .status{
+      border-radius:16px;
+      padding:14px;
+      border: 1px solid rgba(0,0,0,0.10);
+      background: rgba(255,255,255,0.75);
+      line-height:1.45;
+      font-size:13px;
+    }
+    .ok{ border-color: rgba(0,140,70,0.35); background: rgba(0,140,70,0.08); }
+    .warn{ border-color: rgba(255,140,0,0.35); background: rgba(255,140,0,0.10); }
+    .bad{ border-color: rgba(176,0,32,0.35); background: rgba(176,0,32,0.08); }
+
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight:900;
+      letter-spacing:.3px;
+    }
+
+    .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    @media (max-width: 640px){
+      .grid2{ grid-template-columns: 1fr; }
+    }
+
+    footer{
+      padding:12px 18px 18px;
+      font-size:12px;
+      opacity:.7;
+      line-height:1.4;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <header>
+      <h1>🍣 You Me Sushi – Sakura Season (Staff Redeem)</h1>
+      <p>Demo-only staff tool (local device storage). For production, connect to a central voucher database.</p>
+    </header>
+
+    <div class="content">
+      <!-- LOGIN / PIN -->
+      <div class="panel" id="pinPanel">
+        <div class="row">
+          <label for="pin">Staff PIN</label>
+          <input id="pin" type="password" inputmode="numeric" placeholder="Enter PIN to unlock" autocomplete="off" />
+          <div class="btnRow">
+            <button class="primary" id="unlockBtn">Unlock</button>
+            <button class="secondary" id="changePinBtn" type="button">Change PIN</button>
+          </div>
+          <div class="status" id="pinStatus">Locked.</div>
+        </div>
+      </div>
+
+      <!-- REDEEM -->
+      <div class="panel" id="redeemPanel" style="display:none;">
+        <div class="grid2">
+          <div class="row">
+            <label for="branch">Branch</label>
+            <select id="branch">
+              <option value="Brent Cross">Brent Cross</option>
+              <option value="Hampstead">Hampstead</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label for="staffName">Staff Name (optional)</label>
+            <input id="staffName" type="text" placeholder="e.g., Pat / Manager" autocomplete="off" />
+          </div>
+        </div>
+
+        <div class="row">
+          <label for="code">Voucher Code</label>
+          <input id="code" class="mono" type="text" placeholder="e.g., YMS-SAKURA-MISO" autocomplete="off" />
+        </div>
+
+        <div class="btnRow">
+          <button class="primary" id="checkBtn" type="button">Check</button>
+          <button class="primary" id="redeemBtn" type="button">Redeem</button>
+          <button class="secondary" id="clearBtn" type="button">Clear</button>
+          <button class="danger" id="resetBtn" type="button">Reset Local Data</button>
+        </div>
+
+        <div class="status" id="statusBox">Ready.</div>
+      </div>
+    </div>
+
+    <footer>
+      Valid demo codes (from the game):<br/>
+      <span class="mono">YMS-SAKURA-MISO</span> (15–30) •
+      <span class="mono">YMS-SAKURA-MISO-DRINK</span> (31–50) •
+      <span class="mono">YMS-SAKURA-MEAL</span> (51+)
+      <br/><br/>
+      Rule note: “One prize at a time / cannot stack” is enforced centrally only when a backend is used.
+    </footer>
+  </div>
+
+<script>
+(() => {
+  // ===== DEMO CONFIG =====
+  // Change this PIN for tomorrow's demo (keep it simple).
+  // For production, never hardcode PINs in public HTML.
+  const DEFAULT_PIN = "2026";
+
+  // Codes accepted in demo mode:
+  const CODE_CATALOG = {
+    "YMS-SAKURA-MISO": { prize: "Miso Soup", tier: "15–30 petals" },
+    "YMS-SAKURA-MISO-DRINK": { prize: "Miso Soup + Soft Drink", tier: "31–50 petals" },
+    "YMS-SAKURA-MEAL": { prize: "A Meal", tier: "51+ petals" },
+  };
+
+  // Storage keys
+  const PIN_KEY = "ymsStaffPin";
+  const REDEEMS_KEY = "ymsRedeems"; // object: { CODE: { redeemedAt, branch, staffName } }
+
+  // Elements
+  const pinPanel = document.getElementById("pinPanel");
+  const redeemPanel = document.getElementById("redeemPanel");
+  const pinInput = document.getElementById("pin");
+  const unlockBtn = document.getElementById("unlockBtn");
+  const changePinBtn = document.getElementById("changePinBtn");
+  const pinStatus = document.getElementById("pinStatus");
+
+  const branchEl = document.getElementById("branch");
+  const staffNameEl = document.getElementById("staffName");
+  const codeEl = document.getElementById("code");
+  const checkBtn = document.getElementById("checkBtn");
+  const redeemBtn = document.getElementById("redeemBtn");
+  const clearBtn = document.getElementById("clearBtn");
+  const resetBtn = document.getElementById("resetBtn");
+  const statusBox = document.getElementById("statusBox");
+
+  // Helpers
+  function getStoredPin() {
+    return localStorage.getItem(PIN_KEY) || DEFAULT_PIN;
+  }
+
+  function getRedeems() {
+    try { return JSON.parse(localStorage.getItem(REDEEMS_KEY) || "{}"); }
+    catch { return {}; }
+  }
+
+  function setRedeems(obj) {
+    localStorage.setItem(REDEEMS_KEY, JSON.stringify(obj));
+  }
+
+  function setStatus(text, type = "") {
+    statusBox.className = "status" + (type ? " " + type : "");
+    statusBox.innerHTML = text;
+  }
+
+  function setPinStatus(text, type = "") {
+    pinStatus.className = "status" + (type ? " " + type : "");
+    pinStatus.textContent = text;
+  }
+
+  function normalizeCode(raw) {
+    return (raw || "").trim().toUpperCase().replace(/\s+/g, "");
+  }
+
+  function unlock() {
+    const entered = (pinInput.value || "").trim();
+    if (!entered) { setPinStatus("Enter PIN.", "warn"); return; }
+
+    if (entered === getStoredPin()) {
+      redeemPanel.style.display = "block";
+      setPinStatus("Unlocked.", "ok");
+      pinInput.value = "";
+      codeEl.focus();
+    } else {
+      setPinStatus("Wrong PIN.", "bad");
+    }
+  }
+
+  function changePin() {
+    const current = prompt("Enter current PIN:");
+    if (current === null) return;
+
+    if (current.trim() !== getStoredPin()) {
+      setPinStatus("Wrong PIN (cannot change).", "bad");
+      return;
+    }
+
+    const next = prompt("Enter NEW PIN (numbers only recommended):");
+    if (next === null) return;
+
+    const cleaned = next.trim();
+    if (!cleaned) {
+      setPinStatus("PIN not changed (empty).", "warn");
+      return;
+    }
+
+    localStorage.setItem(PIN_KEY, cleaned);
+    setPinStatus("PIN changed successfully.", "ok");
+  }
+
+  function checkCode() {
+    const code = normalizeCode(codeEl.value);
+    if (!code) { setStatus("Enter a voucher code.", "warn"); return; }
+
+    const info = CODE_CATALOG[code];
+    if (!info) {
+      setStatus(`Invalid code: <span class="mono">${code}</span>`, "bad");
+      return;
+    }
+
+    const redeems = getRedeems();
+    const r = redeems[code];
+
+    if (r) {
+      setStatus(
+        `Already redeemed ✅<br/>
+         Code: <span class="mono">${code}</span><br/>
+         Prize: <b>${info.prize}</b> (${info.tier})<br/>
+         Redeemed at: <b>${r.branch}</b><br/>
+         Time: ${new Date(r.redeemedAt).toLocaleString()}<br/>
+         Staff: ${r.staffName || "—"}`,
+        "warn"
+      );
+      return;
+    }
+
+    setStatus(
+      `Valid code ✅<br/>
+       Code: <span class="mono">${code}</span><br/>
+       Prize: <b>${info.prize}</b> (${info.tier})<br/>
+       Status: <b>NOT REDEEMED</b>`,
+      "ok"
+    );
+  }
+
+  function redeemCode() {
+    const code = normalizeCode(codeEl.value);
+    if (!code) { setStatus("Enter a voucher code.", "warn"); return; }
+
+    const info = CODE_CATALOG[code];
+    if (!info) {
+      setStatus(`Invalid code: <span class="mono">${code}</span>`, "bad");
+      return;
+    }
+
+    const redeems = getRedeems();
+    if (redeems[code]) {
+      setStatus(`This code is already redeemed ✅<br/>Code: <span class="mono">${code}</span>`, "warn");
+      return;
+    }
+
+    const entry = {
+      redeemedAt: Date.now(),
+      branch: branchEl.value,
+      staffName: (staffNameEl.value || "").trim()
+    };
+
+    redeems[code] = entry;
+    setRedeems(redeems);
+
+    setStatus(
+      `Redeemed successfully ✅<br/>
+       Code: <span class="mono">${code}</span><br/>
+       Prize: <b>${info.prize}</b> (${info.tier})<br/>
+       Branch: <b>${entry.branch}</b><br/>
+       Time: ${new Date(entry.redeemedAt).toLocaleString()}<br/>
+       Staff: ${entry.staffName || "—"}`,
+      "ok"
+    );
+  }
+
+  function clearForm() {
+    codeEl.value = "";
+    setStatus("Ready.", "");
+    codeEl.focus();
+  }
+
+  function resetLocalData() {
+    const ok = confirm("Reset local redeems on this device? (Demo only)");
+    if (!ok) return;
+    localStorage.removeItem(REDEEMS_KEY);
+    setStatus("Local redeems cleared on this device.", "ok");
+  }
+
+  // Events
+  unlockBtn.addEventListener("click", unlock);
+  pinInput.addEventListener("keydown", (e) => { if (e.key === "Enter") unlock(); });
+  changePinBtn.addEventListener("click", changePin);
+
+  checkBtn.addEventListener("click", checkCode);
+  redeemBtn.addEventListener("click", redeemCode);
+  clearBtn.addEventListener("click", clearForm);
+  resetBtn.addEventListener("click", resetLocalData);
+
+  codeEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") redeemCode();
+  });
+
+  setPinStatus("Locked.", "");
+})();
+</script>
+</body>
+</html>
