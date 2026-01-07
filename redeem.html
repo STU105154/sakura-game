@@ -3,154 +3,233 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>You Me Sushi – Sakura Season (Staff Redeem)</title>
-
+  <title>Sakura Season – Staff Redeem (Demo)</title>
   <style>
-    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:radial-gradient(circle at top,#ffe8f2,#fff); color:#111; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:18px; }
-    .card{ width:min(720px,100%); background:rgba(255,255,255,0.92); border:1px solid rgba(0,0,0,0.08); border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.10); overflow:hidden; }
-    header{ padding:18px 18px 12px; border-bottom:1px solid rgba(0,0,0,0.06); }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #0b0b0b;
+      color:#f7f3ea;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .card{
+      width:min(560px, calc(100vw - 24px));
+      background: rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.10);
+      border-radius: 18px;
+      box-shadow: 0 18px 48px rgba(0,0,0,0.35);
+      overflow:hidden;
+    }
+    header{ padding: 18px 18px 10px; }
     h1{ margin:0 0 6px; font-size:18px; }
-    p{ margin:0; font-size:13px; opacity:.75; line-height:1.4; }
-    .content{ padding:18px; display:grid; gap:14px; }
-    .row{ display:grid; gap:8px; }
-    label{ font-size:12px; font-weight:900; opacity:.85; }
-    input,select{ width:100%; padding:12px 12px; border-radius:14px; border:1px solid rgba(0,0,0,0.14); background:#fff; font-size:14px; outline:none; }
-    .btnRow{ display:flex; gap:10px; flex-wrap:wrap; }
-    button{ border:0; border-radius:14px; padding:12px 14px; font-weight:900; cursor:pointer; font-size:14px; }
-    .primary{ background:#111; color:#fff; }
-    .secondary{ background:#fff; border:1px solid rgba(0,0,0,0.14); color:#111; }
-    .status{ border-radius:16px; padding:14px; border:1px solid rgba(0,0,0,0.10); background:rgba(255,255,255,0.75); line-height:1.45; font-size:13px; }
-    .ok{ border-color: rgba(0,140,70,0.35); background: rgba(0,140,70,0.08); }
-    .warn{ border-color: rgba(255,140,0,0.35); background: rgba(255,140,0,0.10); }
-    .bad{ border-color: rgba(176,0,32,0.35); background: rgba(176,0,32,0.08); }
-    .mono{ font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-weight:900; letter-spacing:.3px; }
-    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    @media(max-width:640px){ .grid2{ grid-template-columns:1fr; } }
+    p{ margin:0; opacity:.75; font-size:13px; line-height:1.35; }
+
+    .wrap{ padding: 0 18px 18px; display:grid; gap:12px; }
+    label{ font-size: 12px; opacity:.85; }
+    input, select{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.35);
+      color:#fff;
+      outline:none;
+      font-size: 14px;
+    }
+    .row{ display:grid; gap:6px; }
+    .btn{
+      appearance:none;
+      border:0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-weight: 900;
+      font-size: 14px;
+      cursor:pointer;
+      background:#fff;
+      color:#111;
+    }
+    .btn.secondary{
+      background: transparent;
+      color:#fff;
+      border:1px solid rgba(255,255,255,0.14);
+    }
+    .pill{
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.06);
+      font-size: 13px;
+      line-height:1.35;
+    }
+    .ok{ border-color: rgba(60, 240, 150, 0.30); }
+    .bad{ border-color: rgba(255, 80, 80, 0.35); }
+
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      letter-spacing: .4px;
+      font-weight: 800;
+    }
+    .muted{ opacity:.7; font-size: 12px; }
   </style>
 </head>
-
 <body>
   <div class="card">
     <header>
-      <h1>🍣 You Me Sushi – Sakura Season (Staff Redeem)</h1>
-      <p>Server-backed redeem tool. Use staff PIN + voucher code.</p>
+      <h1>🍣 Sakura Season – Staff Redeem (Demo)</h1>
+      <p>Demo-only redeem screen. This device will mark the current voucher as redeemed.</p>
     </header>
 
-    <div class="content">
-      <div class="row">
-        <label for="pin">Staff PIN</label>
-        <input id="pin" type="password" placeholder="Enter staff PIN" autocomplete="off" />
-      </div>
+    <div class="wrap">
+      <div class="pill" id="currentBox"></div>
 
-      <div class="grid2">
-        <div class="row">
-          <label for="branch">Branch</label>
-          <select id="branch">
-            <option value="Brent Cross">Brent Cross</option>
-            <option value="Hampstead">Hampstead</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-        <div class="row">
-          <label for="staffName">Staff name (optional)</label>
-          <input id="staffName" type="text" placeholder="e.g., Manager" autocomplete="off" />
-        </div>
+      <div class="row">
+        <label>Branch</label>
+        <select id="branch">
+          <option>You Me Sushi – Hampstead</option>
+          <option>You Me Sushi – Brent Cross</option>
+          <option>You Me Sushi – Other</option>
+        </select>
       </div>
 
       <div class="row">
-        <label for="code">Voucher Code</label>
-        <input id="code" class="mono" type="text" placeholder="e.g., YMS-SAKURA-ABCDEFGH" autocomplete="off" />
+        <label>Staff name (optional)</label>
+        <input id="staffName" placeholder="e.g., Ana" />
       </div>
 
-      <div class="btnRow">
-        <button class="primary" id="redeemBtn" type="button">Redeem</button>
-        <button class="secondary" id="clearBtn" type="button">Clear</button>
+      <div class="row">
+        <label>Staff PIN (demo)</label>
+        <input id="pin" placeholder="Enter PIN" inputmode="numeric" />
+        <div class="muted">Demo PIN: <span class="mono">2026</span></div>
       </div>
 
-      <div class="status" id="statusBox">Ready.</div>
+      <div class="row">
+        <label>Voucher code</label>
+        <input id="code" placeholder="YMS-SAKURA-XXXXXXXX" class="mono" />
+      </div>
+
+      <button class="btn" id="redeemBtn">Redeem</button>
+      <button class="btn secondary" id="backBtn">Back to game</button>
+
+      <div class="pill" id="resultBox" style="display:none;"></div>
+
+      <div class="muted">
+        Official version will validate codes centrally (server + database) and prevent fraud across devices.
+      </div>
     </div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-functions-compat.js"></script>
-
 <script>
 (() => {
-  const firebaseConfig = {
-    apiKey: "AIzaSyCKwvSkOByJQk2F0fPj1Q3lGRmrC4MdRTk",
-    authDomain: "sakura-game-e22d2.firebaseapp.com",
-    projectId: "sakura-game-e22d2",
-    appId: "1:693002131028:web:782d316dbba21fd0143fc1"
-  };
+  const prizeKey = "sakuraDemo:unclaimedPrize";
+  const redeemedKey = "sakuraDemo:redeemedLog";
+  const DEMO_PIN = "2026";
 
-  const FUNCTIONS_REGION = "europe-west2";
-
-  const pinEl = document.getElementById("pin");
+  const currentBox = document.getElementById("currentBox");
+  const resultBox = document.getElementById("resultBox");
   const branchEl = document.getElementById("branch");
   const staffNameEl = document.getElementById("staffName");
+  const pinEl = document.getElementById("pin");
   const codeEl = document.getElementById("code");
-  const redeemBtn = document.getElementById("redeemBtn");
-  const clearBtn = document.getElementById("clearBtn");
-  const statusBox = document.getElementById("statusBox");
 
-  function setStatus(html, type=""){
-    statusBox.className = "status" + (type ? " " + type : "");
-    statusBox.innerHTML = html;
+  function getUnclaimedPrize(){
+    try{
+      const raw = localStorage.getItem(prizeKey);
+      return raw ? JSON.parse(raw) : null;
+    }catch{ return null; }
+  }
+  function clearUnclaimedPrize(){
+    localStorage.removeItem(prizeKey);
   }
 
-  function normalizeCode(raw){
-    return (raw || "").trim().toUpperCase().replace(/\s+/g,"");
+  function addRedeemedLog(entry){
+    const raw = localStorage.getItem(redeemedKey);
+    const arr = raw ? JSON.parse(raw) : [];
+    arr.unshift(entry);
+    localStorage.setItem(redeemedKey, JSON.stringify(arr.slice(0, 50)));
   }
 
-  let functions;
-  try {
-    firebase.initializeApp(firebaseConfig);
-    functions = firebase.app().functions(FUNCTIONS_REGION);
-  } catch (e) {
-    setStatus("Firebase init failed. Check firebaseConfig.", "bad");
-    return;
+  function setResult(ok, html){
+    resultBox.style.display = "block";
+    resultBox.className = "pill " + (ok ? "ok" : "bad");
+    resultBox.innerHTML = html;
   }
 
-  redeemBtn.onclick = async () => {
-    const pin = (pinEl.value || "").trim();
-    const code = normalizeCode(codeEl.value);
-    const branch = branchEl.value;
-    const staffName = (staffNameEl.value || "").trim();
-
-    if (!pin) { setStatus("Enter staff PIN.", "warn"); return; }
-    if (!code) { setStatus("Enter voucher code.", "warn"); return; }
-
-    setStatus("Redeeming…");
-
-    try {
-      const redeemFn = functions.httpsCallable("redeemVoucher");
-      const res = await redeemFn({ pin, code, branch, staffName });
-      const d = res.data;
-
-      if (!d?.ok) {
-        setStatus(`Failed: ${d?.message || "Unknown error"}`, "bad");
-        return;
-      }
-
-      setStatus(
-        `Redeemed ✅<br/>
-         Code: <span class="mono">${d.code}</span><br/>
-         Prize: <b>${d.prizeLabel}</b><br/>
-         Branch: <b>${d.branch}</b><br/>
-         Time: ${new Date(d.redeemedAt).toLocaleString()}<br/>
-         Staff: ${d.staffName || "—"}`,
-        "ok"
-      );
-    } catch (e) {
-      setStatus("Server error while redeeming. Check Functions deployment and region.", "bad");
+  function renderCurrent(){
+    const v = getUnclaimedPrize();
+    if (!v){
+      currentBox.className = "pill bad";
+      currentBox.innerHTML = "No unclaimed prize on this device. Go back to the game and win a prize first.";
+      return;
     }
+    currentBox.className = "pill ok";
+    currentBox.innerHTML =
+      `Current unclaimed prize on this device:<br>` +
+      `Prize: <b>${v.prizeLabel}</b><br>` +
+      `Code: <span class="mono">${v.code}</span><br>` +
+      `<span class="muted">Score: ${v.score} • Created: ${new Date(v.createdAt).toLocaleString()}</span>`;
+    codeEl.value = v.code;
+  }
+
+  document.getElementById("backBtn").onclick = () => {
+    location.href = "./index.html";
   };
 
-  clearBtn.onclick = () => {
-    codeEl.value = "";
-    setStatus("Ready.");
-    codeEl.focus();
+  document.getElementById("redeemBtn").onclick = () => {
+    const v = getUnclaimedPrize();
+    const pin = String(pinEl.value || "").trim();
+    const code = String(codeEl.value || "").trim().toUpperCase();
+    const branch = String(branchEl.value || "").trim();
+    const staffName = String(staffNameEl.value || "").trim();
+
+    if (pin !== DEMO_PIN){
+      setResult(false, "Invalid staff PIN.");
+      return;
+    }
+
+    if (!code.startsWith("YMS-SAKURA-") || code.length < 12){
+      setResult(false, "Invalid code format.");
+      return;
+    }
+
+    if (!v){
+      setResult(false, "No unclaimed prize stored on this device.");
+      return;
+    }
+
+    if (code !== String(v.code).toUpperCase()){
+      setResult(false, "This code does not match the current unclaimed voucher on this device.");
+      return;
+    }
+
+    // Redeem (demo)
+    const entry = {
+      code: v.code,
+      prizeLabel: v.prizeLabel,
+      score: v.score,
+      branch,
+      staffName: staffName || null,
+      redeemedAt: new Date().toISOString()
+    };
+    addRedeemedLog(entry);
+    clearUnclaimedPrize();
+
+    setResult(true,
+      `✅ Redeemed successfully.<br>` +
+      `Code: <span class="mono">${entry.code}</span><br>` +
+      `Prize: <b>${entry.prizeLabel}</b><br>` +
+      `Branch: <b>${entry.branch}</b><br>` +
+      `${entry.staffName ? `Staff: <b>${entry.staffName}</b><br>` : ""}` +
+      `<span class="muted">Redeemed: ${new Date(entry.redeemedAt).toLocaleString()}</span>`
+    );
+
+    // Refresh top card
+    renderCurrent();
   };
+
+  renderCurrent();
 })();
 </script>
 </body>
