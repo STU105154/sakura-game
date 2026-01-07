@@ -19,7 +19,7 @@
 
     .card {
       width: min(520px, calc(100vw - 24px));
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.92);
       border-radius: 20px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
       overflow: hidden;
@@ -27,11 +27,13 @@
 
     header {
       padding: 18px;
+      text-align: center;
     }
 
     h1 {
       margin: 0 0 6px;
       font-size: 18px;
+      user-select: none;
     }
 
     p {
@@ -151,7 +153,7 @@
 <body>
   <div class="card">
     <header>
-      <h1>🌸 Sakura Season – Catch the Petals</h1>
+      <h1 id="secretTitle">🌸 Sakura Season – Catch the Petals</h1>
       <p>Tap as many petals as you can in <b>15 seconds</b>.</p>
       <p class="small" style="margin-top:6px;">
         Prizes: <b>15–30</b> Miso Soup • <b>31–50</b> Miso Soup + Soft Drink • <b>51+</b> A Meal
@@ -238,7 +240,7 @@
     el.style.top = p.y + "px";
     stage.appendChild(el);
 
-    el.addEventListener("pointerdown", e => {
+    el.addEventListener("pointerdown", () => {
       if (!running) return;
       score++;
       scoreEl.textContent = score;
@@ -328,6 +330,21 @@
 • One play per day
 • One prize at a time`
   );
+
+  // ===== SECRET STAFF ACCESS (HOLD TITLE 3s) =====
+  const title = document.getElementById("secretTitle");
+  let pressTimer = null;
+
+  title.addEventListener("pointerdown", () => {
+    pressTimer = setTimeout(() => {
+      window.location.href = "redeem.html";
+    }, 3000);
+  });
+
+  ["pointerup","pointerleave","pointercancel"].forEach(evt =>
+    title.addEventListener(evt, () => clearTimeout(pressTimer))
+  );
+
 })();
 </script>
 </body>
