@@ -176,7 +176,6 @@
       width:100%;
     }
 
-    /* ===== Realistic petals (SVG) ===== */
     .petal{
       position:absolute;
       transform: translate(-50%,-50%);
@@ -317,25 +316,20 @@
   const BG_PATH = "./assets/images/sakura-bg.png";
   const GAME_SECONDS = 15;
 
-  // Windy physics: hard 25, brutal 30
+  // Difficulty: hard 25, brutal 30
   const PHASES = [
-    // 0–5s
-    { t: 0,  spawnPerSec: 3.2, goldChance: 0.38, size: 46, fallMin: 90,  fallMax: 160,  drag: 0.985, tapCooldownMs: 0 },
-    // 5–10s
-    { t: 5,  spawnPerSec: 5.2, goldChance: 0.30, size: 40, fallMin: 120, fallMax: 220,  drag: 0.984, tapCooldownMs: 35 },
-    // 10–15s
-    { t: 10, spawnPerSec: 7.4, goldChance: 0.22, size: 34, fallMin: 150, fallMax: 300,  drag: 0.982, tapCooldownMs: 80 },
+    { t: 0,  spawnPerSec: 3.2, goldChance: 0.38, size: 46, fallMin: 90,  fallMax: 160, drag: 0.985, tapCooldownMs: 0 },
+    { t: 5,  spawnPerSec: 5.2, goldChance: 0.30, size: 40, fallMin: 120, fallMax: 220, drag: 0.984, tapCooldownMs: 35 },
+    { t: 10, spawnPerSec: 7.4, goldChance: 0.22, size: 34, fallMin: 150, fallMax: 300, drag: 0.982, tapCooldownMs: 80 },
   ];
 
-  // Wind params
-  const WIND_BASE = 22;      // px/s baseline drift
-  const WIND_GUST = 130;     // px/s gust intensity
-  const WIND_FREQ = 0.55;    // gust frequency
-  const TURB = 0.9;          // small turbulence strength
+  const WIND_BASE = 22;
+  const WIND_GUST = 130;
+  const WIND_FREQ = 0.55;
+  const TURB = 0.9;
 
   const DAILY_PLAY_LIMIT = 1;
 
-  // Prize rules
   function prizeForScore(score) {
     if (score >= 30) return { tier: 3, label: "Free katsu curry" };
     if (score >= 25) return { tier: 2, label: "50% next purchase" };
@@ -374,7 +368,7 @@
   let lastTapAt = 0;
 
   // ===============================
-  // BG CHECK
+  // BACKGROUND CHECK
   // ===============================
   (function checkBg(){
     const img = new Image();
@@ -392,7 +386,7 @@
   })();
 
   // ===============================
-  // LOCAL STORAGE (demo locks)
+  // LOCAL STORAGE (locks)
   // ===============================
   const todayKey = () => {
     const d = new Date();
@@ -418,7 +412,6 @@
   }
 
   function updateLocksUI(){
-    // ✅ DEV MODE bypass (no restrictions)
     if (DEV_MODE){
       limitMsg.style.display = "none";
       prizeBlockMsg.style.display = "none";
@@ -460,7 +453,7 @@
   }
 
   // ===============================
-  // SOUND (tap noise)
+  // SOUND (tap)
   // ===============================
   let audioCtx = null;
   function ensureAudio(){
@@ -486,38 +479,29 @@
   }
 
   // ===============================
-  // VOUCHER
+  // HELPERS
   // ===============================
-  function randomCode(len=8){
-    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let out = "";
-    for (let i=0;i<len;i++) out += alphabet[Math.floor(Math.random()*alphabet.length)];
-    return out;
-  }
-  function makeVoucher(score){
-    const prize = prizeForScore(score);
-    if (!prize) return null;
-    return {
-      code: `YMS-SAKURA-${randomCode(8)}`,
-      prizeTier: prize.tier,
-      prizeLabel: prize.label,
-      score,
-      createdAt: new Date().toISOString(),
-      status: "UNCLAIMED"
-    };
+  function phaseForElapsed(elapsed){
+    if (elapsed >= PHASES[2].t) return PHASES[2];
+    if (elapsed >= PHASES[1].t) return PHASES[1];
+    return PHASES[0];
   }
 
-  // ===============================
-  // UI helpers
-  // ===============================
+  function windAtTime(t){
+    const gust = Math.sin(t * WIND_FREQ) * 0.7 + Math.sin(t * (WIND_FREQ * 2.3 + 0.1)) * 0.3;
+    return WIND_BASE + gust * WIND_GUST;
+  }
+
   function setToast(html){
     toastEl.innerHTML = html || "";
   }
+
   function resetHud(){
     score = 0;
     scoreEl.textContent = "0";
     timeEl.textContent = GAME_SECONDS.toFixed(1);
   }
+
   function showHow(){
     alert(
 `Tap ONLY gold petals (pink petals don’t count).
@@ -530,16 +514,7 @@ Prizes:
   }
 
   // ===============================
-  // Difficulty helpers
-  // ===============================
-  function phaseForElapsed(elapsed){
-    if (elapsed >= PHASES[2].t) return PHASES[2];
-    if (elapsed >= PHASES[1].t) return PHASES[1];
-    return PHASES[0];
-  }
-
-  // ===============================
-  // SVG Petal (realistic-ish)
+  // SVG PETAL (realistic-ish)
   // ===============================
   function petalSVG(isGold){
     const c1 = isGold ? "#fff3d6" : "#fff";
@@ -583,15 +558,7 @@ Prizes:
   }
 
   // ===============================
-  // Wind
-  // ===============================
-  function windAtTime(t){
-    const gust = Math.sin(t * 0.55) * 0.7 + Math.sin(t * (0.55 * 2.3 + 0.1)) * 0.3;
-    return 22 + gust * 130;
-  }
-
-  // ===============================
-  // Petals: windy falling
+  // PETALS
   // ===============================
   function spawnPetal(elapsed){
     const cfg = phaseForElapsed(elapsed);
@@ -674,7 +641,7 @@ Prizes:
   }
 
   // ===============================
-  // Loop
+  // LOOP
   // ===============================
   function loop(ts){
     if(!running) return;
@@ -699,7 +666,7 @@ Prizes:
     const w = windAtTime(elapsed);
 
     for(const p of [...petals]){
-      const turb = Math.sin((elapsed * 3.7) + p.phase) * 0.9 * 20;
+      const turb = Math.sin((elapsed * 3.7) + p.phase) * TURB * 20;
       const sway = Math.sin((elapsed * p.swayFreq) + p.phase) * p.swayAmp;
       const lift = Math.sin((elapsed * p.liftFreq) + p.phase) * p.liftAmp;
 
@@ -733,7 +700,7 @@ Prizes:
   }
 
   // ===============================
-  // Start / End
+  // GAME START/END
   // ===============================
   function startGame(){
     updateLocksUI();
@@ -788,8 +755,6 @@ Prizes:
     }
 
     const voucher = makeVoucher(score);
-
-    // ✅ In DEV_MODE I don't store unclaimed prize (so it never blocks testing)
     if (!DEV_MODE) setUnclaimedPrize(voucher);
 
     overlay.innerHTML = `
@@ -833,12 +798,25 @@ Prizes:
   }
 
   // ===============================
-  // SOUND
+  // VOUCHER HELPERS
   // ===============================
-  let audioCtx = null;
-  function ensureAudio(){
-    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if(audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
+  function randomCode(len=8){
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let out = "";
+    for (let i=0;i<len;i++) out += alphabet[Math.floor(Math.random()*alphabet.length)];
+    return out;
+  }
+
+  function makeVoucher(score){
+    const p = prizeForScore(score);
+    return {
+      code: `YMS-SAKURA-${randomCode(8)}`,
+      prizeTier: p.tier,
+      prizeLabel: p.label,
+      score,
+      createdAt: new Date().toISOString(),
+      status: "UNCLAIMED"
+    };
   }
 
   // ===============================
@@ -859,7 +837,6 @@ Prizes:
     location.reload();
   });
 
-  // init
   updateLocksUI();
 })();
 </script>
