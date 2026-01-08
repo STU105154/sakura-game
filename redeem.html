@@ -14,6 +14,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
+      padding: 12px;
     }
     .card{
       width:min(560px, calc(100vw - 24px));
@@ -40,6 +41,8 @@
       font-size: 14px;
     }
     .row{ display:grid; gap:6px; }
+
+    .btnRow{ display:grid; gap:10px; }
     .btn{
       appearance:none;
       border:0;
@@ -56,6 +59,12 @@
       color:#fff;
       border:1px solid rgba(255,255,255,0.14);
     }
+    .btn.danger{
+      background: rgba(255,80,80,0.14);
+      color:#fff;
+      border:1px solid rgba(255,80,80,0.28);
+    }
+
     .pill{
       padding: 10px 12px;
       border-radius: 14px;
@@ -73,6 +82,14 @@
       font-weight: 800;
     }
     .muted{ opacity:.7; font-size: 12px; }
+    .twoCol{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 520px){
+      .twoCol{ grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -85,38 +102,47 @@
     <div class="wrap">
       <div class="pill" id="currentBox"></div>
 
-      <div class="row">
-        <label>Branch</label>
-        <select id="branch">
-          <option>You Me Sushi – Hampstead</option>
-          <option>You Me Sushi – Brent Cross</option>
-          <option>You Me Sushi – Other</option>
-        </select>
+      <div class="twoCol">
+        <div class="row">
+          <label>Branch</label>
+          <select id="branch">
+            <option>You Me Sushi – Hampstead</option>
+            <option>You Me Sushi – Brent Cross</option>
+            <option>You Me Sushi – Other</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label>Staff name (optional)</label>
+          <input id="staffName" placeholder="e.g., Ana" />
+        </div>
       </div>
 
-      <div class="row">
-        <label>Staff name (optional)</label>
-        <input id="staffName" placeholder="e.g., Ana" />
+      <div class="twoCol">
+        <div class="row">
+          <label>Staff PIN (demo)</label>
+          <input id="pin" placeholder="Enter PIN" inputmode="numeric" />
+          <div class="muted">Demo PIN: <span class="mono">2026</span></div>
+        </div>
+
+        <div class="row">
+          <label>Voucher code</label>
+          <input id="code" placeholder="YMS-SAKURA-XXXXXXXX" class="mono" />
+          <div class="muted" id="expectedBox" style="display:none;"></div>
+        </div>
       </div>
 
-      <div class="row">
-        <label>Staff PIN (demo)</label>
-        <input id="pin" placeholder="Enter PIN" inputmode="numeric" />
-        <div class="muted">Demo PIN: <span class="mono">2026</span></div>
+      <div class="btnRow">
+        <button class="btn" id="redeemBtn">Redeem</button>
+        <button class="btn secondary" id="backBtn">Back to game</button>
+        <button class="btn danger" id="resetBtn">Reset demo on this device</button>
       </div>
-
-      <div class="row">
-        <label>Voucher code</label>
-        <input id="code" placeholder="YMS-SAKURA-XXXXXXXX" class="mono" />
-      </div>
-
-      <button class="btn" id="redeemBtn">Redeem</button>
-      <button class="btn secondary" id="backBtn">Back to game</button>
 
       <div class="pill" id="resultBox" style="display:none;"></div>
 
       <div class="muted">
-        Official version will validate codes centrally (server + database) and prevent fraud across devices.
+        Tip: you can open this page with <span class="mono">?code=YMS-SAKURA-XXXX</span> to prefill the code.
+        Official version will validate centrally (server + database) and prevent fraud across devices.
       </div>
     </div>
   </div>
@@ -129,6 +155,8 @@
 
   const currentBox = document.getElementById("currentBox");
   const resultBox = document.getElementById("resultBox");
+  const expectedBox = document.getElementById("expectedBox");
+
   const branchEl = document.getElementById("branch");
   const staffNameEl = document.getElementById("staffName");
   const pinEl = document.getElementById("pin");
@@ -145,8 +173,13 @@
   }
 
   function addRedeemedLog(entry){
-    const raw = localStorage.getItem(redeemedKey);
-    const arr = raw ? JSON.parse(raw) : [];
+    let arr = [];
+    try{
+      const raw = localStorage.getItem(redeemedKey);
+      arr = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(arr)) arr = [];
+    }catch{ arr = []; }
+
     arr.unshift(entry);
     localStorage.setItem(redeemedKey, JSON.stringify(arr.slice(0, 50)));
   }
@@ -157,24 +190,54 @@
     resultBox.innerHTML = html;
   }
 
+  function getQueryCode(){
+    const params = new URLSearchParams(location.search);
+    const c = params.get("code");
+    return c ? String(c).trim().toUpperCase() : "";
+  }
+
   function renderCurrent(){
     const v = getUnclaimedPrize();
+    const q = getQueryCode();
+
+    expectedBox.style.display = "none";
+    expectedBox.innerHTML = "";
+
     if (!v){
       currentBox.className = "pill bad";
-      currentBox.innerHTML = "No unclaimed prize on this device. Go back to the game and win a prize first.";
+      currentBox.innerHTML =
+        "No unclaimed prize on this device.<br>" +
+        "<span class='muted'>If the customer shows a code, paste it above and (in the official version) we’d validate it centrally.</span>";
+      if (q && !codeEl.value) codeEl.value = q;
       return;
     }
+
     currentBox.className = "pill ok";
     currentBox.innerHTML =
       `Current unclaimed prize on this device:<br>` +
       `Prize: <b>${v.prizeLabel}</b><br>` +
       `Code: <span class="mono">${v.code}</span><br>` +
       `<span class="muted">Score: ${v.score} • Created: ${new Date(v.createdAt).toLocaleString()}</span>`;
-    codeEl.value = v.code;
+
+    // Prefill code field
+    if (q) codeEl.value = q;
+    else codeEl.value = v.code;
+
+    expectedBox.style.display = "block";
+    expectedBox.innerHTML = `Expected: <span class="mono">${String(v.code).toUpperCase()}</span>`;
   }
 
   document.getElementById("backBtn").onclick = () => {
     location.href = "./index.html";
+  };
+
+  document.getElementById("resetBtn").onclick = () => {
+    const ok = confirm("Reset demo on this device?\nThis will clear the current unclaimed voucher and the redeemed log.");
+    if (!ok) return;
+    localStorage.removeItem(prizeKey);
+    localStorage.removeItem(redeemedKey);
+    setResult(true, "✅ Demo reset completed on this device.");
+    renderCurrent();
   };
 
   document.getElementById("redeemBtn").onclick = () => {
@@ -200,7 +263,10 @@
     }
 
     if (code !== String(v.code).toUpperCase()){
-      setResult(false, "This code does not match the current unclaimed voucher on this device.");
+      setResult(false,
+        "This code does not match the current unclaimed voucher on this device.<br>" +
+        "<span class='muted'>In the official version, this would be validated centrally across devices.</span>"
+      );
       return;
     }
 
@@ -213,6 +279,7 @@
       staffName: staffName || null,
       redeemedAt: new Date().toISOString()
     };
+
     addRedeemedLog(entry);
     clearUnclaimedPrize();
 
@@ -225,7 +292,6 @@
       `<span class="muted">Redeemed: ${new Date(entry.redeemedAt).toLocaleString()}</span>`
     );
 
-    // Refresh top card
     renderCurrent();
   };
 
