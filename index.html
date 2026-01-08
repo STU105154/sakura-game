@@ -3,18 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>🌸 Sakura Tap (Demo) — Catch the Petals</title>
+  <title>🌸 Sakura Tap (Demo) — Wind Petals</title>
 
   <style>
     :root{
       --text:#f7f3ea;
       --muted: rgba(247,243,234,.75);
-      --panel: rgba(0,0,0,.40);
       --stroke: rgba(255,255,255,.14);
       --gold:#d4a956;
-
-      --pink1:#ffb4d1;
-      --pink2:#ff8ab8;
     }
 
     *{ box-sizing:border-box; }
@@ -26,11 +22,10 @@
       overflow:hidden;
     }
 
-    /* ✅ Background Sakura */
     .bg{
       position:fixed; inset:0;
       background:
-        linear-gradient(rgba(0,0,0,.20), rgba(0,0,0,.58)),
+        linear-gradient(rgba(0,0,0,.20), rgba(0,0,0,.60)),
         url("./assets/images/sakura-bg.png");
       background-size:cover;
       background-position:center;
@@ -39,14 +34,13 @@
     }
     .vignette{
       position:fixed; inset:0;
-      background: radial-gradient(circle at 50% 20%, rgba(255,255,255,.06), rgba(0,0,0,.72) 72%);
+      background: radial-gradient(circle at 50% 20%, rgba(255,255,255,.06), rgba(0,0,0,.76) 72%);
       pointer-events:none;
     }
 
-    /* Top shell */
     .shell{
       position:relative;
-      width:min(820px, calc(100vw - 24px));
+      width:min(860px, calc(100vw - 24px));
       margin: 12px auto;
       background: rgba(0,0,0,0.30);
       border:1px solid var(--stroke);
@@ -56,24 +50,12 @@
       backdrop-filter: blur(10px);
     }
     header{ padding: 16px 16px 10px; }
-    .headRow{
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-    h1{
-      font-size: 20px;
-      margin: 0;
-      letter-spacing:.2px;
-    }
+    h1{ font-size: 20px; margin: 0; letter-spacing:.2px; }
     .sub{
-      margin-top:6px;
-      margin-bottom:0;
+      margin:6px 0 0 0;
       color: var(--muted);
-      line-height:1.35;
       font-size:13px;
+      line-height:1.35;
     }
     .sub b{ color: var(--gold); }
 
@@ -86,11 +68,10 @@
     .rules b{ color: var(--text); }
 
     .stageWrap{ padding: 0 16px 16px; }
-
     #stage{
       position: relative;
       width: 100%;
-      height: min(74vh, 840px);
+      height: min(74vh, 860px);
       border-radius: 18px;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,0.10);
@@ -109,10 +90,9 @@
       background: rgba(0,0,0,0.38);
       border: 1px solid rgba(255,255,255,0.14);
       border-radius: 999px;
-      font-weight: 900;
+      font-weight: 950;
       font-size: 12.5px;
       backdrop-filter: blur(6px);
-      color: var(--text);
       display:inline-flex;
       align-items:center;
       gap:8px;
@@ -133,11 +113,11 @@
       padding:18px;
       text-align:center;
       z-index: 10;
-      background: radial-gradient(circle at 50% 20%, rgba(0,0,0,.10), rgba(0,0,0,.38));
+      background: radial-gradient(circle at 50% 20%, rgba(0,0,0,.10), rgba(0,0,0,.40));
     }
-    .stack{ display:grid; gap:10px; justify-items:center; max-width: 560px; }
+    .stack{ display:grid; gap:10px; justify-items:center; max-width: 580px; }
 
-    .btnRow{ display:grid; gap:10px; width:min(320px, 100%); }
+    .btnRow{ display:grid; gap:10px; width:min(340px, 100%); }
     .btn{
       appearance:none;
       border:1px solid rgba(212,169,86,.45);
@@ -174,42 +154,27 @@
       width:100%;
     }
 
-    /* ===== Petals — same style/shape as your falling code ===== */
+    /* ===== Realistic petals (SVG inside) ===== */
     .petal{
       position:absolute;
-      width: 36px;
-      height: 36px;
-      border-radius: 12px 18px 12px 18px;
       transform: translate(-50%,-50%);
-      border: 1px solid rgba(255,255,255,0.12);
       user-select:none;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
-      box-shadow: 0 10px 22px rgba(0,0,0,.18);
-      will-change: transform, left, top;
-    }
-    .petal::before{
-      content:"";
-      position:absolute;
-      inset:10px 12px;
-      border-radius:999px;
-      background: rgba(255,255,255,0.55);
-      opacity:.60;
+      pointer-events:auto;
+      will-change: transform, left, top, filter, opacity;
     }
 
-    /* Pink decoy */
-    .petal.pink{
-      background: radial-gradient(circle at 30% 30%, #fff, var(--pink1) 55%, var(--pink2));
-      box-shadow: 0 8px 16px rgba(255, 110, 170, 0.18);
-      border-color: rgba(255,255,255,0.14);
+    .petal svg{
+      display:block;
+      width:100%;
+      height:100%;
+      filter: drop-shadow(0 10px 16px rgba(0,0,0,.22));
     }
 
-    /* Gold target (counts) */
-    .petal.gold{
-      background: radial-gradient(circle at 30% 30%, #fff, rgba(212,169,86,.92) 55%, rgba(212,169,86,.72));
-      border-color: rgba(212,169,86,.85);
-      box-shadow: 0 10px 22px rgba(212,169,86, 0.16);
-      filter: drop-shadow(0 0 10px rgba(212,169,86,.18));
+    /* Gold highlight = same shape, different fill, subtle glow */
+    .petal.gold svg{
+      filter: drop-shadow(0 10px 16px rgba(0,0,0,.22)) drop-shadow(0 0 12px rgba(212,169,86,.14));
     }
 
     .toast{
@@ -263,9 +228,7 @@
 
   <div class="shell">
     <header>
-      <div class="headRow">
-        <h1>🌸 Sakura Tap (15s)</h1>
-      </div>
+      <h1>🌸 Sakura Tap (15s)</h1>
       <p class="sub"><b>Tap ONLY the gold petals.</b> Pink petals don’t count.</p>
 
       <div class="rules">
@@ -287,7 +250,7 @@
         <div class="center" id="overlay">
           <div class="stack">
             <div style="font-weight:950;font-size:18px;">Ready?</div>
-            <div class="small">Tap gold petals as they fall. It gets faster and harder.</div>
+            <div class="small">Petals fall like a windy day. Tap gold only. It gets chaotic.</div>
 
             <div class="btnRow">
               <button class="btn" id="startBtn">Start</button>
@@ -319,16 +282,21 @@
   const BG_PATH = "./assets/images/sakura-bg.png";
   const GAME_SECONDS = 15;
 
-  // Difficulty: dynamic falling like your code + scaling
-  // Goal: hard to reach 25, brutal to reach 30
+  // Windy physics: hard 25, brutal 30
   const PHASES = [
-    // 0–5s: easier
-    { t: 0,  spawnPerSec: 3.2, goldChance: 0.38, size: 38, speedMin: 130, speedMax: 250, drift: 18, sway: 14, cooldownMs: 0 },
-    // 5–10s: faster, smaller, fewer gold
-    { t: 5,  spawnPerSec: 4.9, goldChance: 0.30, size: 34, speedMin: 170, speedMax: 330, drift: 28, sway: 20, cooldownMs: 35 },
-    // 10–15s: brutal
-    { t: 10, spawnPerSec: 6.8, goldChance: 0.22, size: 28, speedMin: 220, speedMax: 440, drift: 44, sway: 26, cooldownMs: 75 },
+    // 0–5s
+    { t: 0,  spawnPerSec: 3.2, goldChance: 0.38, size: 46, fallMin: 90,  fallMax: 160,  drag: 0.985, tapCooldownMs: 0 },
+    // 5–10s
+    { t: 5,  spawnPerSec: 5.2, goldChance: 0.30, size: 40, fallMin: 120, fallMax: 220,  drag: 0.984, tapCooldownMs: 35 },
+    // 10–15s
+    { t: 10, spawnPerSec: 7.4, goldChance: 0.22, size: 34, fallMin: 150, fallMax: 300,  drag: 0.982, tapCooldownMs: 80 },
   ];
+
+  // Wind (global) parameters
+  const WIND_BASE = 22;      // px/s baseline drift
+  const WIND_GUST = 130;     // px/s gust intensity
+  const WIND_FREQ = 0.55;    // gust frequency
+  const TURB = 0.9;          // small turbulence strength
 
   const DAILY_PLAY_LIMIT = 1;
 
@@ -360,11 +328,12 @@
   // ===============================
   let running = false;
   let soundOn = true;
-
   let score = 0;
+
   let startTs = 0;
   let lastTs = null;
   let rafId = null;
+
   let spawnAcc = 0;
   let petals = [];
   let lastTapAt = 0;
@@ -407,7 +376,6 @@
     }catch{ return null; }
   }
   function setUnclaimedPrize(obj){ localStorage.setItem(prizeKey(), JSON.stringify(obj)); }
-  function clearUnclaimedPrize(){ localStorage.removeItem(prizeKey()); }
 
   function updateLocksUI(){
     const plays = getPlaysToday();
@@ -457,14 +425,14 @@
     const g = audioCtx.createGain();
 
     o.type = "triangle";
-    o.frequency.setValueAtTime(ok ? 880 : 240, t);
-    o.frequency.exponentialRampToValueAtTime(ok ? 1400 : 300, t + 0.05);
+    o.frequency.setValueAtTime(ok ? 920 : 250, t);
+    o.frequency.exponentialRampToValueAtTime(ok ? 1500 : 320, t + 0.05);
 
     g.gain.setValueAtTime(ok ? 0.07 : 0.09, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.075);
 
     o.connect(g); g.connect(audioCtx.destination);
-    o.start(t); o.stop(t + 0.08);
+    o.start(t); o.stop(t + 0.09);
   }
 
   // ===============================
@@ -509,12 +477,8 @@
    - 18–24: Free miso soup
    - 25–29: 50% next purchase
    - 30+: Free katsu curry
-• Difficulty increases:
-   - More petals
-   - Faster fall
-   - Smaller petals
-   - Stronger sideways drift
-• Demo mode:
+• Windy physics: petals drift + flutter + gusts.
+• Demo:
    - 1 play/day per device
    - 1 prize at a time (redeem before playing again)`
     );
@@ -530,7 +494,65 @@
   }
 
   // ===============================
-  // Petals: dynamic falling (sway + drift + spin)
+  // SVG Petal Generator (realistic shape)
+  // ===============================
+  function petalSVG(isGold){
+    // Pink vs Gold palette
+    const c1 = isGold ? "#fff3d6" : "#fff";
+    const c2 = isGold ? "#e9c779" : "#ffb4d1";
+    const c3 = isGold ? "#d4a956" : "#ff8ab8";
+    const vein = isGold ? "rgba(255,255,255,.45)" : "rgba(255,255,255,.55)";
+
+    // Organic sakura-like teardrop
+    return `
+      <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <radialGradient id="g" cx="30%" cy="25%" r="80%">
+            <stop offset="0%" stop-color="${c1}"/>
+            <stop offset="55%" stop-color="${c2}"/>
+            <stop offset="100%" stop-color="${c3}"/>
+          </radialGradient>
+          <linearGradient id="s" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="rgba(255,255,255,.35)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+          </linearGradient>
+        </defs>
+
+        <!-- main petal -->
+        <path d="M50 6
+                 C72 18, 92 42, 88 67
+                 C84 92, 62 112, 50 114
+                 C38 112, 16 92, 12 67
+                 C8 42, 28 18, 50 6 Z"
+              fill="url(#g)"/>
+
+        <!-- highlight -->
+        <path d="M36 28
+                 C54 20, 74 42, 70 66
+                 C66 88, 50 96, 40 92
+                 C28 88, 20 66, 24 50
+                 C26 40, 30 32, 36 28 Z"
+              fill="url(#s)" opacity=".75"/>
+
+        <!-- veins -->
+        <path d="M50 18 C46 40, 46 66, 50 108" stroke="${vein}" stroke-width="2" opacity=".35" fill="none"/>
+        <path d="M50 42 C40 54, 32 64, 26 72" stroke="${vein}" stroke-width="1.6" opacity=".25" fill="none"/>
+        <path d="M50 42 C60 54, 68 64, 74 72" stroke="${vein}" stroke-width="1.6" opacity=".25" fill="none"/>
+      </svg>
+    `;
+  }
+
+  // ===============================
+  // Wind function (gusty)
+  // ===============================
+  function windAtTime(t){
+    // t in seconds (global)
+    const gust = Math.sin(t * WIND_FREQ) * 0.7 + Math.sin(t * (WIND_FREQ * 2.3 + 0.1)) * 0.3;
+    return WIND_BASE + gust * WIND_GUST;
+  }
+
+  // ===============================
+  // Petals: windy falling
   // ===============================
   function spawnPetal(elapsed){
     const cfg = phaseForElapsed(elapsed);
@@ -538,86 +560,83 @@
 
     const isGold = Math.random() < cfg.goldChance;
 
-    // Size variance, plus slight scale variance in motion
-    const baseSize = cfg.size + (Math.random() * 2 - 1) * 2;
-    const size = Math.max(22, Math.round(baseSize));
+    // size (petal image-like)
+    const size = Math.max(26, Math.round(cfg.size + (Math.random()*4 - 2)));
 
-    const x = 12 + Math.random() * (rect.width - 24);
-    const y = -20;
+    const x = 20 + Math.random() * (rect.width - 40);
+    const y = -40 - Math.random()*60;
 
-    const speed = cfg.speedMin + Math.random() * (cfg.speedMax - cfg.speedMin);
+    // velocities
+    const vy = cfg.fallMin + Math.random() * (cfg.fallMax - cfg.fallMin);
+    const vx = (Math.random()*2 - 1) * 25;
 
-    // Core lateral drift (px/sec) + sway amplitude (px)
-    const drift = (Math.random()*2 - 1) * cfg.drift;
-    const swayAmp = (Math.random()*0.6 + 0.7) * cfg.sway;     // 0.7–1.3x
-    const swayFreq = (Math.random()*0.7 + 0.7) * 2.2;         // rad/sec-ish
-    const swayPhase = Math.random() * Math.PI * 2;
+    // flutter
+    const rot = Math.random()*360;
+    const rotSpeed = (Math.random()*240 - 120);
+
+    // per-petal sway
+    const swayAmp = 10 + Math.random()*22;
+    const swayFreq = 1.2 + Math.random()*1.8;
+    const phase = Math.random() * Math.PI * 2;
+
+    // small lift wobble
+    const liftAmp = 6 + Math.random()*10;
+    const liftFreq = 1.8 + Math.random()*2.1;
 
     const el = document.createElement("div");
     el.className = "petal " + (isGold ? "gold" : "pink");
     el.style.width = size + "px";
-    el.style.height = size + "px";
+    el.style.height = Math.round(size * 1.1) + "px";
+    el.innerHTML = petalSVG(isGold);
     stage.appendChild(el);
 
-    const rot = Math.random() * 360;
-    const rotSpeed = (Math.random()*140 - 70);
-
-    // tiny scale wiggle
-    const scaleBase = 0.92 + Math.random()*0.18; // 0.92–1.10
-    const scaleWobble = (Math.random()*0.05) + 0.02;
-
-    const petal = {
+    const p = {
       el,
       isGold,
       x, y,
-      x0: x,
-      speed,
-      drift,
-      swayAmp,
-      swayFreq,
-      swayPhase,
-      rot,
-      rotSpeed,
-      scaleBase,
-      scaleWobble
+      vx, vy,
+      rot, rotSpeed,
+      swayAmp, swayFreq, phase,
+      liftAmp, liftFreq,
+      bornT: elapsed,
+      scale: 0.90 + Math.random()*0.22,
+      opacity: 0.85 + Math.random()*0.15
     };
+    el.style.opacity = p.opacity;
 
-    // hitbox tap
     el.addEventListener("pointerdown", (e) => {
-      if (!running) return;
+      if(!running) return;
       e.preventDefault();
 
       const now = performance.now();
-      const cooldown = cfg.cooldownMs || 0;
-      if (cooldown && (now - lastTapAt) < cooldown) return;
+      const cd = cfg.tapCooldownMs || 0;
+      if (cd && (now - lastTapAt) < cd) return;
       lastTapAt = now;
 
-      if (!petal.isGold){
+      if(!p.isGold){
         tapSound(false);
-        // small feedback
-        el.style.filter = "drop-shadow(0 0 12px rgba(255,80,80,.35))";
-        setTimeout(()=> el.style.filter = "", 140);
+        p.el.style.filter = "drop-shadow(0 0 14px rgba(255,80,80,.35))";
+        setTimeout(()=> { if(p.el) p.el.style.filter = ""; }, 140);
         return;
       }
 
       tapSound(true);
       score += 1;
       scoreEl.textContent = String(score);
-      removePetal(petal);
+      removePetal(p);
 
       setToast("🌸 +1");
       clearTimeout(setToast._t);
       setToast._t = setTimeout(() => setToast(""), 260);
     }, { passive:false });
 
-    petals.push(petal);
+    petals.push(p);
   }
 
   function removePetal(p){
     p.el.remove();
     petals = petals.filter(x => x !== p);
   }
-
   function clearAllPetals(){
     petals.forEach(p => p.el.remove());
     petals = [];
@@ -647,30 +666,42 @@
     }
 
     const rect = stage.getBoundingClientRect();
+    const w = windAtTime(elapsed);
 
     for(const p of [...petals]){
-      p.y += p.speed * dt;
+      // global wind + turbulence
+      const turb = Math.sin((elapsed * 3.7) + p.phase) * TURB * 20;
 
-      // sway around original x0
-      const sway = Math.sin((elapsed * p.swayFreq) + p.swayPhase) * p.swayAmp;
-      p.x = p.x0 + (p.drift * elapsed) + sway;
+      // sway (like falling from trees)
+      const sway = Math.sin((elapsed * p.swayFreq) + p.phase) * p.swayAmp;
 
-      // wrap / bounce softly
-      if (p.x < 6) p.x = 6;
-      if (p.x > rect.width - 6) p.x = rect.width - 6;
+      // flutter lift (tiny up/down wobble)
+      const lift = Math.sin((elapsed * p.liftFreq) + p.phase) * p.liftAmp;
 
-      p.rot += p.rotSpeed * dt;
+      // integrate velocities
+      p.vx += (w * 0.35 + turb) * dt;     // accelerate sideways
+      p.vx *= cfg.drag;                  // drag
+      p.vy += 12 * dt;                   // gravity-ish
+      p.vy *= (cfg.drag + 0.002);        // slight vertical drag
 
-      // slight scale wobble
-      const sc = p.scaleBase + Math.sin((elapsed * 3.3) + p.swayPhase) * p.scaleWobble;
+      // position
+      p.x += (p.vx * dt) + sway * dt * 35;
+      p.y += (p.vy * dt) - lift * dt * 18;
 
+      // rotation flutter
+      p.rot += (p.rotSpeed + (p.vx * 0.35)) * dt;
+
+      // bounds: bounce softly on sides
+      if(p.x < 10){ p.x = 10; p.vx *= -0.55; }
+      if(p.x > rect.width - 10){ p.x = rect.width - 10; p.vx *= -0.55; }
+
+      // render
       p.el.style.left = p.x + "px";
       p.el.style.top = p.y + "px";
-      p.el.style.transform = `translate(-50%,-50%) rotate(${p.rot}deg) scale(${sc})`;
+      p.el.style.transform = `translate(-50%,-50%) rotate(${p.rot}deg) scale(${p.scale})`;
 
-      if(p.y > rect.height + 70){
-        removePetal(p);
-      }
+      // remove when off screen
+      if(p.y > rect.height + 120) removePetal(p);
     }
 
     if(tLeft <= 0.001){
@@ -682,7 +713,7 @@
   }
 
   // ===============================
-  // Game start/end
+  // Start / End
   // ===============================
   function startGame(){
     updateLocksUI();
@@ -716,11 +747,11 @@
 
     clearAllPetals();
 
-    const p = prizeForScore(score);
+    const prize = prizeForScore(score);
 
     overlay.style.display = "grid";
 
-    if(!p){
+    if(!prize){
       overlay.innerHTML = `
         <div class="stack">
           <div style="font-weight:950;font-size:18px;">Time!</div>
@@ -780,7 +811,15 @@
   // Events
   // ===============================
   startBtn.addEventListener("click", startGame);
-  howBtn.addEventListener("click", showHow);
+  howBtn.addEventListener("click", () => alert(
+`Tap ONLY gold petals.
+Pink petals don’t count.
+15 seconds.
+Prize tiers:
+• 18–24: Free miso soup
+• 25–29: 50% next purchase
+• 30+: Free katsu curry`
+  ));
 
   soundBtn.addEventListener("click", () => {
     soundOn = !soundOn;
@@ -788,7 +827,7 @@
     if(soundOn) ensureAudio();
   });
 
-  // init locks
+  // init
   updateLocksUI();
 })();
 </script>
