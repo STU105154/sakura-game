@@ -2,514 +2,772 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Sakura Season – Catch the Petals</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Sakura Tap — Demo</title>
   <style>
-    :root { --pad: 16px; --ink:#111; --muted: rgba(0,0,0,.65); }
-
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(circle at top, #ffe8f2, #fff);
-      color: var(--ink);
-      min-height: 100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+    :root{
+      --gold:#d4a956;
+      --text:#f7f3ea;
+      --muted: rgba(247,243,234,.72);
+      --panel: rgba(0,0,0,.35);
+      --stroke: rgba(255,255,255,.16);
+      --ok:#6ee7b7;
+      --bad:#fb7185;
     }
 
-    .card{
-      width:min(560px, calc(100vw - 24px));
-      background: rgba(255,255,255,0.90);
-      border:1px solid rgba(0,0,0,0.08);
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; padding:0; height:100%; background:#000; color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+    body{ overflow:hidden; touch-action:manipulation; }
+
+    /* Background */
+    .bg{
+      position:fixed; inset:0;
+      background:
+        linear-gradient(rgba(0,0,0,.18), rgba(0,0,0,.42)),
+        url("assets/img/sakura-bg.png");
+      background-size:cover;
+      background-position:center;
+      transform:scale(1.02);
+      filter:saturate(1.05);
+    }
+    .vignette{
+      position:fixed; inset:0;
+      background: radial-gradient(circle at 50% 20%, rgba(255,255,255,.06), rgba(0,0,0,.65) 70%);
+      pointer-events:none;
+    }
+
+    /* UI */
+    .hud{
+      position:fixed; left:12px; right:12px; top:12px;
+      display:flex; gap:10px; align-items:stretch; justify-content:space-between;
+      pointer-events:none;
+    }
+    .hud .card{
+      pointer-events:auto;
+      background:var(--panel);
+      border:1px solid var(--stroke);
+      backdrop-filter: blur(6px);
+      border-radius:16px;
+      padding:10px 12px;
+      display:flex; gap:10px; align-items:center;
+      min-width: 160px;
+    }
+    .hud .title{ font-size:12px; color:var(--muted); margin-bottom:2px; }
+    .hud .value{ font-size:18px; font-weight:750; letter-spacing:.2px; }
+    .hud .right{ text-align:right; }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(212,169,86,.35);
+      background:rgba(0,0,0,.25);
+      color:var(--muted);
+      font-size:12px;
+      pointer-events:auto;
+      user-select:none;
+    }
+    .pill b{ color:var(--gold); }
+
+    .centerPanel{
+      position:fixed; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      padding:20px;
+      pointer-events:none;
+    }
+    .modal{
+      pointer-events:auto;
+      width:min(520px, 92vw);
+      background:rgba(0,0,0,.45);
+      border:1px solid var(--stroke);
+      backdrop-filter: blur(10px);
+      border-radius:22px;
+      padding:18px;
+      box-shadow: 0 22px 70px rgba(0,0,0,.55);
+    }
+    h1{ margin:0 0 8px 0; font-size:22px; }
+    p{ margin:0 0 10px 0; color:var(--muted); line-height:1.45; font-size:13px; }
+    .rules{
+      display:grid; gap:8px; margin:12px 0 14px 0;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:16px;
+      padding:12px;
+      background:rgba(255,255,255,.04);
+    }
+    .ruleRow{ display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:13px; }
+    .ruleRow b{ color:var(--text); font-weight:650; }
+    .btnRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    button{
+      appearance:none;
+      border:1px solid rgba(212,169,86,.45);
+      background:rgba(0,0,0,.35);
+      color:var(--text);
+      padding:11px 14px;
+      border-radius:14px;
+      cursor:pointer;
+      font-weight:650;
+      letter-spacing:.2px;
+    }
+    button:hover{ background:rgba(212,169,86,.10); }
+    .ghost{
+      border-color:rgba(255,255,255,.18);
+    }
+    .ghost:hover{ background:rgba(255,255,255,.06); }
+
+    .note{
+      margin-top:10px;
+      font-size:12px;
+      color:rgba(247,243,234,.55);
+    }
+
+    /* Game field */
+    .field{
+      position:fixed; inset:0;
       overflow:hidden;
     }
 
-    header{ padding: 18px 18px 10px; }
-    h1{ font-size: 18px; margin: 0 0 6px; }
-    p{ margin:0; opacity:.75; line-height:1.35; font-size:14px; }
-
-    .rules{
-      margin-top:10px;
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.35;
-    }
-    .rules b{ color: var(--ink); }
-
-    .stageWrap{ padding: 0 18px 18px; }
-
-    #stage{
-      position: relative;
-      width: 100%;
-      aspect-ratio: 9 / 14;
-      background: linear-gradient(180deg, rgba(255,210,230,0.55), rgba(255,255,255,0.95));
-      border-radius: 18px;
-      overflow: hidden;
-      border: 1px solid rgba(0,0,0,0.06);
-      touch-action: manipulation;
-    }
-
-    .hud{
-      position:absolute; top:10px; left:10px; right:10px;
-      display:flex; justify-content:space-between; gap:10px;
-      pointer-events:none;
-    }
-
-    .pill{
-      padding: 8px 10px;
-      background: rgba(255,255,255,0.85);
-      border: 1px solid rgba(0,0,0,0.07);
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 13px;
-      backdrop-filter: blur(6px);
-    }
-
-    .center{
-      position:absolute; inset:0;
-      display:grid;
-      place-items:center;
-      padding:18px;
-      text-align:center;
-    }
-
-    .btn{
-      appearance:none;
-      border:0;
-      border-radius:14px;
-      padding:12px 16px;
-      font-weight:800;
-      font-size:15px;
-      background:#111;
-      color:#fff;
-      width:min(320px, 100%);
-      cursor:pointer;
-    }
-    .btn.secondary{
-      background:#fff;
-      color:#111;
-      border:1px solid rgba(0,0,0,0.12);
-      font-weight:800;
-    }
-
-    .stack{ display:grid; gap:10px; justify-items:center; }
-    .small{ font-size: 12px; opacity:.72; line-height: 1.35; }
-    .small a{ color:#111; }
-
+    /* Petal styles */
     .petal{
       position:absolute;
-      width: 36px; height: 36px;
-      transform: translate(-50%,-50%) rotate(0deg);
-      border-radius: 12px 18px 12px 18px;
-      background: radial-gradient(circle at 30% 30%, #fff, #ffb4d1 55%, #ff8ab8);
-      box-shadow: 0 8px 16px rgba(255, 110, 170, 0.18);
-      border: 1px solid rgba(0,0,0,0.05);
+      width:64px; height:64px;
+      border-radius: 16px 46px 16px 46px;
+      transform: rotate(18deg);
+      background:
+        radial-gradient(circle at 35% 30%, rgba(255,255,255,.95), rgba(255,255,255,.0) 55%),
+        radial-gradient(circle at 30% 25%, rgba(255,183,210,.95), rgba(255,183,210,.15) 62%),
+        linear-gradient(140deg, rgba(255,210,230,.85), rgba(255,150,190,.55));
+      box-shadow:
+        0 10px 26px rgba(0,0,0,.25),
+        inset 0 1px 0 rgba(255,255,255,.35);
+      border:1px solid rgba(255,255,255,.20);
+      opacity:.95;
+      transition: transform 120ms ease, filter 120ms ease, opacity 120ms ease;
       user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
-    .petal:before{
+    .petal::after{
       content:"";
+      position:absolute; inset:10px;
+      border-radius: 14px 40px 14px 40px;
+      background: radial-gradient(circle at 45% 40%, rgba(255,255,255,.65), rgba(255,255,255,0) 60%);
+      opacity:.45;
+      transform: rotate(-10deg);
+    }
+
+    /* Highlight (ONLY TAP THIS) */
+    .target{
+      border-color: rgba(212,169,86,.7);
+      filter: drop-shadow(0 0 12px rgba(212,169,86,.55)) drop-shadow(0 0 28px rgba(255,255,255,.12));
+      animation: pulse 760ms ease-in-out infinite;
+    }
+    @keyframes pulse{
+      0%,100%{ transform: scale(1) rotate(18deg); }
+      50%{ transform: scale(1.08) rotate(18deg); }
+    }
+
+    /* Wrong tap feedback */
+    .wrongFlash{
+      animation: wrong 220ms ease-in-out 1;
+    }
+    @keyframes wrong{
+      0%{ filter:none; }
+      30%{ filter: drop-shadow(0 0 14px rgba(251,113,133,.65)); }
+      100%{ filter:none; }
+    }
+
+    /* Small floating particles */
+    .spark{
       position:absolute;
-      inset:10px 12px;
+      width:8px; height:8px;
       border-radius:999px;
-      background: rgba(255,255,255,0.55);
-      filter: blur(0.2px);
-    }
-
-    .toast{
-      position:absolute; bottom:10px; left:10px; right:10px;
-      display:grid; place-items:center;
+      background:rgba(255,255,255,.9);
+      box-shadow: 0 0 14px rgba(255,255,255,.35);
       pointer-events:none;
-      font-size:12px;
-      opacity:.85;
-      min-height: 18px;
+      opacity:.9;
+      transform: translate(-50%,-50%);
+      animation: pop 520ms ease-out forwards;
+    }
+    @keyframes pop{
+      0%{ opacity:.95; transform: translate(-50%,-50%) scale(1); }
+      100%{ opacity:0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.2); }
     }
 
-    .code{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      padding: 10px 12px;
-      background: rgba(0,0,0,0.06);
-      border-radius: 10px;
-      display:inline-block;
-      margin-top: 8px;
-      letter-spacing: 0.5px;
-      font-weight: 800;
+    /* End screen prize */
+    .prizeBig{
+      font-size:18px;
+      font-weight:800;
+      color:var(--ok);
+      margin-top:8px;
     }
+    .prizeBig.bad{ color:var(--bad); }
 
-    .notice{
-      background: rgba(0,0,0,0.06);
-      border: 1px solid rgba(0,0,0,0.08);
-      padding: 10px 12px;
-      border-radius: 12px;
-      font-size: 12px;
-      color: rgba(0,0,0,0.75);
-      line-height: 1.35;
-      max-width: 420px;
-    }
+    /* Hide modal when playing */
+    .hidden{ display:none !important; }
   </style>
 </head>
-
 <body>
-  <div class="card">
-    <header>
-      <h1>🌸 Sakura Season – Catch the Petals</h1>
-      <p>Tap as many petals as you can in <b>15 seconds</b>.</p>
+  <div class="bg"></div>
+  <div class="vignette"></div>
 
-      <div class="rules">
-        Prizes:
-        <b>15–30</b> petals = <b>Miso Soup</b> •
-        <b>31–50</b> petals = <b>Miso Soup + Soft Drink</b> •
-        <b>51+</b> petals = <b>A Meal</b>
+  <div class="field" id="field"></div>
+
+  <div class="hud">
+    <div class="card">
+      <div>
+        <div class="title">Score</div>
+        <div class="value" id="score">0</div>
       </div>
-      <div class="rules">
-        One play per day (per device). One prize at a time.
-      </div>
-    </header>
+    </div>
 
-    <div class="stageWrap">
-      <div id="stage" aria-label="Game area">
-        <div class="hud">
-          <div class="pill">⏱ <span id="time">15.0</span>s</div>
-          <div class="pill">🌸 Petals: <span id="score">0</span></div>
-        </div>
+    <div class="pill" id="difficultyPill">Difficulty: <b id="diffText">Easy</b></div>
 
-        <div class="center" id="overlay">
-          <div class="stack" id="overlayInner">
-            <div style="font-weight:900;font-size:18px;">Ready?</div>
-            <div class="small">
-              Tap petals to score. Hit the prize ranges above to win a voucher.
-            </div>
-
-            <button class="btn" id="startBtn">Start</button>
-            <button class="btn secondary" id="howBtn">How it works</button>
-
-            <div class="small" id="limitMsg" style="display:none;"></div>
-            <div class="small" id="prizeBlockMsg" style="display:none;"></div>
-
-            <div class="notice">
-              Demo mode: limits are stored on this device/browser. For the official campaign we’ll enable server validation.
-            </div>
-          </div>
-        </div>
-
-        <div class="toast" id="toast"></div>
+    <div class="card right">
+      <div>
+        <div class="title">Time</div>
+        <div class="value"><span id="time">15.0</span>s</div>
       </div>
     </div>
   </div>
 
-<script>
-(() => {
-  // ===== CONFIG =====
-  const GAME_SECONDS = 15;
-  const SPAWN_PER_SEC = 2.4;
-  const FALL_SPEED_MIN = 130;
-  const FALL_SPEED_MAX = 280;
-  const DAILY_PLAY_LIMIT = 1;
+  <!-- Start / End Modal -->
+  <div class="centerPanel" id="overlay">
+    <div class="modal" id="modal">
+      <h1>Sakura Tap (15s)</h1>
+      <p>Tap only on the <b style="color:var(--gold)">highlighted</b> petal. The game gets harder as it goes on.</p>
 
-  // Prize ranges (Option B)
-  function prizeForScore(score) {
-    if (score >= 51) return { tier: 3, label: "A Meal" };
-    if (score >= 31) return { tier: 2, label: "Miso Soup + Soft Drink" };
-    if (score >= 15) return { tier: 1, label: "Miso Soup" };
-    return null;
-  }
-
-  // ===== ELEMENTS =====
-  const stage = document.getElementById("stage");
-  const overlay = document.getElementById("overlay");
-  const startBtn = document.getElementById("startBtn");
-  const howBtn = document.getElementById("howBtn");
-  const scoreEl = document.getElementById("score");
-  const timeEl = document.getElementById("time");
-  const toastEl = document.getElementById("toast");
-  const limitMsg = document.getElementById("limitMsg");
-  const prizeBlockMsg = document.getElementById("prizeBlockMsg");
-
-  // ===== STATE =====
-  let running = false;
-  let score = 0;
-  let tLeft = GAME_SECONDS;
-  let lastTs = null;
-  let spawnAcc = 0;
-  let petals = [];
-  let rafId = null;
-
-  // ===== LOCAL STORAGE KEYS =====
-  const todayKey = () => {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-  };
-
-  const playsKey = () => `sakuraDemo:plays:${todayKey()}`;
-  const prizeKey = () => `sakuraDemo:unclaimedPrize`;
-
-  function getPlaysToday() {
-    return Number(localStorage.getItem(playsKey()) || "0");
-  }
-  function incPlaysToday() {
-    localStorage.setItem(playsKey(), String(getPlaysToday() + 1));
-  }
-
-  function getUnclaimedPrize() {
-    try {
-      const raw = localStorage.getItem(prizeKey());
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
-  }
-  function setUnclaimedPrize(obj) {
-    localStorage.setItem(prizeKey(), JSON.stringify(obj));
-  }
-  function clearUnclaimedPrize() {
-    localStorage.removeItem(prizeKey());
-  }
-
-  // ===== UI HELPERS =====
-  function setToast(html) { toastEl.innerHTML = html || ""; }
-
-  function resetHud() {
-    score = 0;
-    tLeft = GAME_SECONDS;
-    scoreEl.textContent = String(score);
-    timeEl.textContent = tLeft.toFixed(1);
-  }
-
-  function showHow() {
-    alert(
-`How it works:
-• Tap petals to score.
-• Game lasts ${GAME_SECONDS} seconds.
-• Prize ranges:
-   - 15–30: Miso Soup
-   - 31–50: Miso Soup + Soft Drink
-   - 51+: A Meal
-• One play per day (per device).
-• One prize at a time (redeem before playing again).`
-    );
-  }
-
-  function updateLocksUI() {
-    const plays = getPlaysToday();
-    const unclaimed = getUnclaimedPrize();
-
-    limitMsg.style.display = "none";
-    prizeBlockMsg.style.display = "none";
-
-    if (unclaimed) {
-      prizeBlockMsg.style.display = "block";
-      prizeBlockMsg.innerHTML =
-        `You have an unclaimed prize: <b>${unclaimed.prizeLabel}</b>.<br>` +
-        `Redeem it first: <a href="./redeem.html">Open staff redeem</a>`;
-      startBtn.disabled = true;
-      startBtn.style.opacity = "0.5";
-      startBtn.style.cursor = "not-allowed";
-      return;
-    }
-
-    if (plays >= DAILY_PLAY_LIMIT) {
-      limitMsg.style.display = "block";
-      limitMsg.textContent = "You’ve already played today. Scan again tomorrow 🌸";
-      startBtn.disabled = true;
-      startBtn.style.opacity = "0.5";
-      startBtn.style.cursor = "not-allowed";
-      return;
-    }
-
-    startBtn.disabled = false;
-    startBtn.style.opacity = "1";
-    startBtn.style.cursor = "pointer";
-  }
-
-  // ===== VOUCHER CODE GEN =====
-  function randomCode(len=8){
-    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let out = "";
-    for (let i=0;i<len;i++) out += alphabet[Math.floor(Math.random()*alphabet.length)];
-    return out;
-  }
-
-  function makeVoucher(score){
-    const prize = prizeForScore(score);
-    if (!prize) return null;
-    return {
-      code: `YMS-SAKURA-${randomCode(8)}`,
-      prizeTier: prize.tier,
-      prizeLabel: prize.label,
-      score,
-      createdAt: new Date().toISOString(),
-      status: "UNCLAIMED"
-    };
-  }
-
-  // ===== PETALS =====
-  function spawnPetal() {
-    const rect = stage.getBoundingClientRect();
-    const x = 12 + Math.random() * (rect.width - 24);
-    const y = -10;
-    const speed = FALL_SPEED_MIN + Math.random() * (FALL_SPEED_MAX - FALL_SPEED_MIN);
-
-    const el = document.createElement("div");
-    el.className = "petal";
-    el.style.left = x + "px";
-    el.style.top = y + "px";
-    el.style.transform = `translate(-50%, -50%) rotate(${Math.random()*360}deg)`;
-    stage.appendChild(el);
-
-    const petal = { el, x, y, speed, rot: Math.random()*360, rotSpeed: (Math.random()*120 - 60) };
-
-    el.addEventListener("pointerdown", (e) => {
-      if (!running) return;
-      e.preventDefault();
-
-      score += 1;
-      scoreEl.textContent = String(score);
-
-      removePetal(petal);
-
-      setToast("🌸 +1");
-      clearTimeout(setToast._t);
-      setToast._t = setTimeout(() => setToast(""), 400);
-    }, { passive:false });
-
-    petals.push(petal);
-  }
-
-  function removePetal(petal) {
-    petal.el.remove();
-    petals = petals.filter(p => p !== petal);
-  }
-
-  function clearAllPetals() {
-    petals.forEach(p => p.el.remove());
-    petals = [];
-  }
-
-  // ===== GAME LOOP =====
-  function loop(ts) {
-    if (!running) return;
-    if (lastTs == null) lastTs = ts;
-    const dt = Math.min(0.033, (ts - lastTs) / 1000);
-    lastTs = ts;
-
-    tLeft -= dt;
-    timeEl.textContent = Math.max(0, tLeft).toFixed(1);
-
-    spawnAcc += dt * SPAWN_PER_SEC;
-    while (spawnAcc >= 1) {
-      spawnPetal();
-      spawnAcc -= 1;
-    }
-
-    const rect = stage.getBoundingClientRect();
-    for (const p of [...petals]) {
-      p.y += p.speed * dt;
-      p.rot += p.rotSpeed * dt;
-      p.el.style.top = p.y + "px";
-      p.el.style.transform = `translate(-50%, -50%) rotate(${p.rot}deg)`;
-      if (p.y > rect.height + 40) removePetal(p);
-    }
-
-    if (tLeft <= 0) endGame();
-    else rafId = requestAnimationFrame(loop);
-  }
-
-  function startGame() {
-    updateLocksUI();
-    const plays = getPlaysToday();
-    const unclaimed = getUnclaimedPrize();
-
-    if (unclaimed) return;
-    if (plays >= DAILY_PLAY_LIMIT) return;
-
-    incPlaysToday();
-    resetHud();
-    clearAllPetals();
-    setToast("");
-    overlay.style.display = "none";
-
-    running = true;
-    lastTs = null;
-    spawnAcc = 0;
-    rafId = requestAnimationFrame(loop);
-  }
-
-  function endGame() {
-    running = false;
-    if (rafId) cancelAnimationFrame(rafId);
-    rafId = null;
-
-    clearAllPetals();
-
-    const prize = prizeForScore(score);
-
-    overlay.style.display = "grid";
-
-    if (!prize) {
-      overlay.innerHTML = `
-        <div class="stack">
-          <div style="font-weight:900;font-size:18px;">Time!</div>
-          <div>🌸 Your score: <b>${score}</b></div>
-          <div style="font-weight:900;font-size:16px;margin-top:6px;">No prize today</div>
-          <div class="small">Try again tomorrow 🌸</div>
-          <div class="small">Tip: Aim for 15–30 (Miso Soup), 31–50 (Miso Soup + Soft Drink) or 51+ (A Meal).</div>
-          <button class="btn" id="okBtn">OK</button>
-          <div class="small">Limit: ${DAILY_PLAY_LIMIT} play/day per device (demo mode).</div>
-        </div>
-      `;
-      document.getElementById("okBtn").onclick = () => location.reload();
-      return;
-    }
-
-    // Prize won -> create voucher and BLOCK further play until redeemed
-    const voucher = makeVoucher(score);
-    setUnclaimedPrize(voucher);
-
-    overlay.innerHTML = `
-      <div class="stack">
-        <div style="font-weight:900;font-size:18px;">You won! 🎉</div>
-        <div>🌸 Your score: <b>${score}</b></div>
-
-        <div style="margin-top:6px;">
-          <div style="font-weight:900;font-size:16px;">Prize: ${voucher.prizeLabel}</div>
-          <div class="small">Show this code at the counter.</div>
-          <div class="code">${voucher.code}</div>
-          <div class="small" style="margin-top:6px;">One prize at a time: redeem before playing again.</div>
-        </div>
-
-        <button class="btn" id="redeemBtn">Open Staff Redeem</button>
-        <button class="btn secondary" id="shareBtn">Share</button>
-
-        <div class="small">Demo mode (no server). Official campaign will validate centrally.</div>
+      <div class="rules">
+        <div class="ruleRow"><span>18–24</span> <b>Free miso soup</b></div>
+        <div class="ruleRow"><span>25–29</span> <b>50% next purchase</b></div>
+        <div class="ruleRow"><span>30+</span> <b>Free katsu curry</b></div>
       </div>
-    `;
 
-    document.getElementById("redeemBtn").onclick = () => {
-      location.href = "./redeem.html";
+      <p>
+        Difficulty scaling is tuned so it’s <b>hard</b> to reach 25 and <b>really hard</b> to reach 30:
+        smaller targets, more decoys, faster switching, and movement.
+      </p>
+
+      <div class="btnRow">
+        <button id="startBtn">Start</button>
+        <button class="ghost" id="muteBtn">Sound: ON</button>
+      </div>
+
+      <div class="note">
+        Tip: Use one finger, quick taps. Wrong taps cost points + a tiny time penalty.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================
+       GAME CONFIG (tuned)
+       ============================ */
+    const GAME_SECONDS = 15.0;
+
+    // Difficulty phases (seconds elapsed):
+    // 0–5  Easy: fewer petals, bigger target, slow switch
+    // 5–10 Medium: more petals, smaller, movement starts, faster switch
+    // 10–15 Hard: lots of decoys, small & fast moving, target switches very fast
+    function getPhase(elapsed){
+      if(elapsed < 5) return "EASY";
+      if(elapsed < 10) return "MED";
+      return "HARD";
+    }
+
+    const PHASE_SETTINGS = {
+      EASY: {
+        label: "Easy",
+        petals: 5,
+        targetSize: 68,
+        decoySize: 64,
+        switchMs: 900,
+        move: false,
+        moveSpeed: 0,
+        points: 1,
+        wrongPenalty: 1,
+        timePenalty: 0.10,
+      },
+      MED: {
+        label: "Medium",
+        petals: 7,
+        targetSize: 56,
+        decoySize: 54,
+        switchMs: 700,
+        move: true,
+        moveSpeed: 0.55,
+        points: 1,
+        wrongPenalty: 2,
+        timePenalty: 0.14,
+      },
+      HARD: {
+        label: "Hard",
+        petals: 10,
+        targetSize: 46,
+        decoySize: 44,
+        switchMs: 520,
+        move: true,
+        moveSpeed: 0.95,
+        points: 1,
+        wrongPenalty: 3,
+        timePenalty: 0.18,
+      }
     };
 
-    document.getElementById("shareBtn").onclick = async () => {
-      const text = `I scored ${score} in the Sakura Season game 🌸`;
-      const shareData = { title: "Sakura Season", text, url: location.href };
-      try {
-        if (navigator.share) await navigator.share(shareData);
-        else {
-          await navigator.clipboard.writeText(`${text} ${location.href}`);
-          alert("Copied to clipboard!");
+    // Extra “anti-30” tuning:
+    // - In HARD phase: target is only reliably tappable for a short window before it swaps.
+    // - A tiny global cooldown stops ultra-spam tapping from inflating score.
+    const GLOBAL_TAP_COOLDOWN_MS = 95;
+
+    /* ============================
+       DOM
+       ============================ */
+    const field = document.getElementById("field");
+    const overlay = document.getElementById("overlay");
+    const startBtn = document.getElementById("startBtn");
+    const muteBtn = document.getElementById("muteBtn");
+    const scoreEl = document.getElementById("score");
+    const timeEl = document.getElementById("time");
+    const diffText = document.getElementById("diffText");
+
+    /* ============================
+       State
+       ============================ */
+    let running = false;
+    let soundOn = true;
+
+    let score = 0;
+    let remaining = GAME_SECONDS;
+    let startTs = 0;
+    let rafId = null;
+
+    let petals = [];
+    let targetIndex = -1;
+    let switchTimer = null;
+
+    let lastTapAt = 0;
+    let extraTimeDebt = 0; // penalties reduce time
+
+    /* ============================
+       Sound (tap noise) — no files
+       ============================ */
+    let audioCtx = null;
+    function ensureAudio(){
+      if(!audioCtx){
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if(audioCtx.state === "suspended"){
+        audioCtx.resume().catch(()=>{});
+      }
+    }
+    function tapSound(ok){
+      if(!soundOn) return;
+      ensureAudio();
+      if(!audioCtx) return;
+
+      const t = audioCtx.currentTime;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+
+      // Slightly nicer “click”:
+      // correct: higher + softer; wrong: lower + sharper
+      const freq = ok ? 880 : 220;
+      o.type = "triangle";
+      o.frequency.setValueAtTime(freq, t);
+      o.frequency.exponentialRampToValueAtTime(freq * (ok ? 1.6 : 1.2), t + 0.05);
+
+      g.gain.setValueAtTime(ok ? 0.07 : 0.10, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+
+      o.connect(g);
+      g.connect(audioCtx.destination);
+      o.start(t);
+      o.stop(t + 0.08);
+    }
+
+    /* ============================
+       Helpers
+       ============================ */
+    function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+    function rand(min, max){ return Math.random() * (max - min) + min; }
+
+    function viewport(){
+      return {
+        w: window.innerWidth,
+        h: window.innerHeight
+      };
+    }
+
+    function setDifficultyLabel(phase){
+      diffText.textContent = PHASE_SETTINGS[phase].label;
+    }
+
+    function setScore(n){
+      score = Math.max(0, n);
+      scoreEl.textContent = score;
+    }
+
+    function setTime(sec){
+      timeEl.textContent = sec.toFixed(1);
+    }
+
+    function spawnSpark(x, y, ok){
+      const s = document.createElement("div");
+      s.className = "spark";
+      s.style.left = x + "px";
+      s.style.top = y + "px";
+      s.style.background = ok ? "rgba(255,255,255,.95)" : "rgba(251,113,133,.95)";
+      s.style.setProperty("--dx", (rand(-26, 26)).toFixed(0) + "px");
+      s.style.setProperty("--dy", (rand(-40, -10)).toFixed(0) + "px");
+      field.appendChild(s);
+      setTimeout(()=> s.remove(), 560);
+    }
+
+    function clearField(){
+      field.innerHTML = "";
+      petals = [];
+      targetIndex = -1;
+    }
+
+    /* ============================
+       Petal creation / placement
+       ============================ */
+    function createPetal(){
+      const el = document.createElement("div");
+      el.className = "petal";
+      el.dataset.isTarget = "0";
+      el._x = 0; el._y = 0;
+      el._vx = 0; el._vy = 0;
+      field.appendChild(el);
+      return el;
+    }
+
+    function placePetal(el, size){
+      const { w, h } = viewport();
+      const pad = 18;
+
+      // avoid top HUD area a bit
+      const topSafe = 78;
+
+      el.style.width = size + "px";
+      el.style.height = size + "px";
+
+      const x = rand(pad, w - pad - size);
+      const y = rand(topSafe, h - pad - size);
+      el._x = x; el._y = y;
+
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+
+      // random rotation variety
+      const rot = rand(-40, 40);
+      el.style.transform = `rotate(${rot}deg)`;
+      el._rot = rot;
+    }
+
+    function initPetalsForPhase(phase){
+      clearTimeout(switchTimer);
+      switchTimer = null;
+
+      const cfg = PHASE_SETTINGS[phase];
+
+      // Ensure we have exactly cfg.petals elements
+      clearField();
+      for(let i=0;i<cfg.petals;i++){
+        const p = createPetal();
+        petals.push(p);
+      }
+
+      // Place them
+      for(let i=0;i<petals.length;i++){
+        const isTarget = (i === 0);
+        const size = isTarget ? cfg.targetSize : cfg.decoySize;
+        placePetal(petals[i], size);
+
+        if(cfg.move){
+          petals[i]._vx = rand(-1, 1) * cfg.moveSpeed;
+          petals[i]._vy = rand(-1, 1) * cfg.moveSpeed;
+        }else{
+          petals[i]._vx = 0; petals[i]._vy = 0;
         }
-      } catch {}
-    };
-  }
+      }
 
-  // ===== EVENTS =====
-  startBtn.addEventListener("click", startGame);
-  howBtn.addEventListener("click", showHow);
+      // Pick a target
+      targetIndex = Math.floor(Math.random() * petals.length);
+      applyTarget(targetIndex, phase);
 
-  // Initialize locks
-  updateLocksUI();
-})();
-</script>
+      // Attach taps
+      petals.forEach((el, idx) => {
+        el.onclick = (e) => handleTap(e, idx);
+      });
+
+      // start switching target
+      scheduleTargetSwitch();
+    }
+
+    function applyTarget(idx, phase){
+      petals.forEach((p, i) => {
+        p.classList.toggle("target", i === idx);
+        p.dataset.isTarget = (i === idx) ? "1" : "0";
+        // ensure target uses targetSize
+        const cfg = PHASE_SETTINGS[phase];
+        const size = (i === idx) ? cfg.targetSize : cfg.decoySize;
+        p.style.width = size + "px";
+        p.style.height = size + "px";
+      });
+    }
+
+    function scheduleTargetSwitch(){
+      if(!running) return;
+
+      const elapsed = (performance.now() - startTs) / 1000;
+      const phase = getPhase(elapsed);
+      const cfg = PHASE_SETTINGS[phase];
+
+      clearTimeout(switchTimer);
+      switchTimer = setTimeout(() => {
+        if(!running) return;
+
+        // re-pick target
+        let next = Math.floor(Math.random() * petals.length);
+        if(next === targetIndex && petals.length > 1){
+          next = (next + 1) % petals.length;
+        }
+        targetIndex = next;
+        applyTarget(targetIndex, phase);
+
+        // in HARD phase, also “teleport” a few decoys to increase chaos
+        if(phase === "HARD"){
+          const moves = Math.floor(rand(2, 5));
+          for(let i=0;i<moves;i++){
+            const j = Math.floor(Math.random() * petals.length);
+            const isTarget = (j === targetIndex);
+            placePetal(petals[j], isTarget ? cfg.targetSize : cfg.decoySize);
+          }
+        }
+
+        scheduleTargetSwitch();
+      }, cfg.switchMs);
+    }
+
+    /* ============================
+       Movement loop
+       ============================ */
+    function movePetals(){
+      const elapsed = (performance.now() - startTs) / 1000;
+      const phase = getPhase(elapsed);
+      const cfg = PHASE_SETTINGS[phase];
+      if(!cfg.move) return;
+
+      const { w, h } = viewport();
+      const pad = 10;
+      const topSafe = 76;
+
+      for(const p of petals){
+        const size = parseFloat(getComputedStyle(p).width) || 50;
+
+        // subtle drift + bounce
+        p._x += p._vx;
+        p._y += p._vy;
+
+        // slight random jitter in HARD
+        if(phase === "HARD"){
+          p._x += rand(-0.35, 0.35);
+          p._y += rand(-0.25, 0.25);
+        }
+
+        if(p._x < pad){ p._x = pad; p._vx *= -1; }
+        if(p._x > w - pad - size){ p._x = w - pad - size; p._vx *= -1; }
+        if(p._y < topSafe){ p._y = topSafe; p._vy *= -1; }
+        if(p._y > h - pad - size){ p._y = h - pad - size; p._vy *= -1; }
+
+        p.style.left = p._x + "px";
+        p.style.top = p._y + "px";
+      }
+    }
+
+    /* ============================
+       Tap handling
+       ============================ */
+    function handleTap(ev, idx){
+      if(!running) return;
+
+      const now = performance.now();
+      if(now - lastTapAt < GLOBAL_TAP_COOLDOWN_MS) return;
+      lastTapAt = now;
+
+      const elapsed = (performance.now() - startTs) / 1000;
+      const phase = getPhase(elapsed);
+      const cfg = PHASE_SETTINGS[phase];
+      setDifficultyLabel(phase);
+
+      const isTarget = (idx === targetIndex);
+
+      // Tap position
+      const rect = petals[idx].getBoundingClientRect();
+      const x = rect.left + rect.width/2;
+      const y = rect.top + rect.height/2;
+
+      if(isTarget){
+        tapSound(true);
+        spawnSpark(x, y, true);
+        setScore(score + cfg.points);
+
+        // Make it harder to “farm”:
+        // In MED/HARD, after a correct tap, instantly switch target
+        if(phase !== "EASY"){
+          let next = Math.floor(Math.random() * petals.length);
+          if(next === targetIndex && petals.length > 1) next = (next + 1) % petals.length;
+          targetIndex = next;
+          applyTarget(targetIndex, phase);
+
+          // also move some petals to new positions in HARD
+          if(phase === "HARD"){
+            for(let k=0;k<3;k++){
+              const j = Math.floor(Math.random() * petals.length);
+              const isT = (j === targetIndex);
+              placePetal(petals[j], isT ? cfg.targetSize : cfg.decoySize);
+            }
+          }
+        }
+      }else{
+        tapSound(false);
+        spawnSpark(x, y, false);
+        petals[idx].classList.add("wrongFlash");
+        setTimeout(()=> petals[idx].classList.remove("wrongFlash"), 240);
+
+        // penalties (this is what makes 25/30 hard)
+        setScore(score - cfg.wrongPenalty);
+        extraTimeDebt += cfg.timePenalty;
+      }
+    }
+
+    /* ============================
+       Game lifecycle
+       ============================ */
+    function startGame(){
+      ensureAudio();
+
+      running = true;
+      overlay.classList.add("hidden");
+
+      setScore(0);
+      remaining = GAME_SECONDS;
+      extraTimeDebt = 0;
+      setTime(remaining);
+
+      startTs = performance.now();
+      lastTapAt = 0;
+
+      // Initial phase setup
+      const phase = getPhase(0);
+      setDifficultyLabel(phase);
+      initPetalsForPhase(phase);
+
+      // Main loop
+      const tick = () => {
+        if(!running) return;
+
+        const now = performance.now();
+        const elapsed = (now - startTs) / 1000;
+
+        // Update phase if crossed boundary (rebuild petals so it “feels” harder)
+        const phaseNow = getPhase(elapsed);
+        setDifficultyLabel(phaseNow);
+
+        // Remaining time with penalties
+        const timeSpent = elapsed + extraTimeDebt;
+        remaining = clamp(GAME_SECONDS - timeSpent, 0, GAME_SECONDS);
+        setTime(remaining);
+
+        // Motion
+        movePetals();
+
+        // If phase changed exactly at 5 or 10, rebuild to apply new counts/sizes
+        // Simple check: rebuild near boundaries
+        if(Math.abs(elapsed - 5) < 0.016 || Math.abs(elapsed - 10) < 0.016){
+          initPetalsForPhase(phaseNow);
+        }
+
+        if(remaining <= 0.001){
+          endGame();
+          return;
+        }
+
+        rafId = requestAnimationFrame(tick);
+      };
+      rafId = requestAnimationFrame(tick);
+    }
+
+    function getPrizeForScore(s){
+      if(s >= 30) return { ok:true, name:"Free katsu curry", msg:"Congratulations! You won a free katsu curry to collect now in store." };
+      if(s >= 25) return { ok:true, name:"50% next purchase", msg:"Congratulations! You won 50% off your next purchase to collect now in store." };
+      if(s >= 18) return { ok:true, name:"Free miso soup", msg:"Congratulations! You won a free miso soup to collect now in store." };
+      return { ok:false, name:"No prize this time", msg:"So close. Try again — tap only the highlighted petals!" };
+    }
+
+    function endGame(){
+      running = false;
+      cancelAnimationFrame(rafId);
+      clearTimeout(switchTimer);
+
+      // freeze field
+      // (optional: keep petals visible)
+      const prize = getPrizeForScore(score);
+
+      // show end modal
+      overlay.classList.remove("hidden");
+      document.getElementById("modal").innerHTML = `
+        <h1>Time’s up!</h1>
+        <p class="muted">Final score: <b style="color:var(--gold)">${score}</b></p>
+
+        <div class="rules" style="margin-top:12px">
+          <div class="ruleRow"><span>18–24</span> <b>Free miso soup</b></div>
+          <div class="ruleRow"><span>25–29</span> <b>50% next purchase</b></div>
+          <div class="ruleRow"><span>30+</span> <b>Free katsu curry</b></div>
+        </div>
+
+        <div class="prizeBig ${prize.ok ? "" : "bad"}">${prize.ok ? prize.name : "No prize"}</div>
+        <p style="margin-top:8px">${prize.msg}</p>
+
+        <div class="btnRow" style="margin-top:12px">
+          <button id="restartBtn">Play again</button>
+          <button class="ghost" id="muteBtn2">Sound: ${soundOn ? "ON" : "OFF"}</button>
+        </div>
+
+        <div class="note">Note: Difficulty scales over the 15 seconds — it’s designed to be hard to hit 25 and very hard to hit 30.</div>
+      `;
+
+      // rebind buttons
+      document.getElementById("restartBtn").onclick = () => {
+        clearField();
+        startGame();
+      };
+      document.getElementById("muteBtn2").onclick = () => toggleSound(document.getElementById("muteBtn2"));
+    }
+
+    function toggleSound(btn){
+      soundOn = !soundOn;
+      if(btn) btn.textContent = `Sound: ${soundOn ? "ON" : "OFF"}`;
+      if(muteBtn) muteBtn.textContent = `Sound: ${soundOn ? "ON" : "OFF"}`;
+    }
+
+    /* ============================
+       Bind UI
+       ============================ */
+    startBtn.addEventListener("click", startGame);
+    muteBtn.addEventListener("click", () => toggleSound(muteBtn));
+
+    // Make sure resize doesn’t break bounds badly
+    window.addEventListener("resize", () => {
+      if(!running) return;
+      // just gently re-place all petals inside new bounds
+      const elapsed = (performance.now() - startTs) / 1000;
+      const phase = getPhase(elapsed);
+      const cfg = PHASE_SETTINGS[phase];
+      petals.forEach((p, i) => {
+        const size = (i === targetIndex) ? cfg.targetSize : cfg.decoySize;
+        placePetal(p, size);
+      });
+    });
+  </script>
 </body>
 </html>
