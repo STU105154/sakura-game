@@ -1,844 +1,244 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>🌸 Sakura Tap (Demo) — Wind Petals</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Sakura Tap – Demo</title>
 
-  <style>
-    :root{
-      --text:#f7f3ea;
-      --muted: rgba(247,243,234,.75);
-      --stroke: rgba(255,255,255,.14);
-      --gold:#d4a956;
-    }
+<style>
+:root{
+  --gold:#d4a956;
+  --text:#f7f3ea;
+}
 
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; margin:0; }
-    body{
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:#000;
-      color:var(--text);
-      overflow:hidden;
-    }
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  background:#000;
+  color:var(--text);
+  overflow:hidden;
+}
 
-    .bg{
-      position:fixed; inset:0;
-      background:
-        linear-gradient(rgba(0,0,0,.20), rgba(0,0,0,.60)),
-        url("./assets/images/sakura-bg.png");
-      background-size:cover;
-      background-position:center;
-      transform:scale(1.02);
-      filter:saturate(1.05);
-    }
-    .vignette{
-      position:fixed; inset:0;
-      background: radial-gradient(circle at 50% 20%, rgba(255,255,255,.06), rgba(0,0,0,.76) 72%);
-      pointer-events:none;
-    }
+.bg{
+  position:fixed;inset:0;
+  background:
+    linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.6)),
+    url("./assets/images/sakura-bg.png") center/cover no-repeat;
+}
 
-    .shell{
-      position:relative;
-      width:min(860px, calc(100vw - 24px));
-      margin: 12px auto;
-      background: rgba(0,0,0,0.30);
-      border:1px solid var(--stroke);
-      border-radius: 22px;
-      box-shadow: 0 18px 60px rgba(0,0,0,0.55);
-      overflow:hidden;
-      backdrop-filter: blur(10px);
-    }
+.shell{
+  position:relative;
+  width:min(860px,calc(100vw - 20px));
+  margin:10px auto;
+  border-radius:22px;
+  background:rgba(0,0,0,.35);
+  border:1px solid rgba(255,255,255,.15);
+  overflow:hidden;
+}
 
-    header{ padding: 16px 16px 10px; }
-    h1{ font-size: 20px; margin: 0; letter-spacing:.2px; }
-    .sub{
-      margin:6px 0 0 0;
-      color: var(--muted);
-      font-size:13px;
-      line-height:1.35;
-    }
-    .sub b{ color: var(--gold); }
+header{padding:16px}
+h1{margin:0;font-size:20px}
+.rules{font-size:13px;opacity:.85;margin-top:8px}
 
-    .rules{
-      margin-top:10px;
-      font-size: 12.5px;
-      color: var(--muted);
-      line-height: 1.35;
-    }
-    .rules b{ color: var(--text); }
+.stageWrap{padding:0 16px 16px}
+#stage{
+  position:relative;
+  height:70vh;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.15);
+}
 
-    .devBadge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      margin-top:10px;
-      font-size: 12px;
-      font-weight: 900;
-      color: rgba(247,243,234,.92);
-      padding: 7px 10px;
-      border-radius: 999px;
-      border:1px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.35);
-      width: fit-content;
-    }
-    .devDot{
-      width:10px; height:10px;
-      border-radius:999px;
-      background: rgba(60,240,150,.9);
-      box-shadow: 0 0 14px rgba(60,240,150,.18);
-    }
+.hud{
+  position:absolute;
+  top:10px;left:10px;right:10px;
+  display:flex;
+  justify-content:space-between;
+  pointer-events:none;
+  z-index:5;
+}
+.pill{
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(0,0,0,.5);
+  border:1px solid rgba(255,255,255,.2);
+  font-weight:800;
+  font-size:13px;
+}
 
-    .stageWrap{ padding: 0 16px 16px; }
-    #stage{
-      position: relative;
-      width: 100%;
-      height: min(74vh, 860px);
-      border-radius: 18px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(0,0,0,0.10);
-      touch-action: manipulation;
-    }
+/* 🔥 FIX DOS BOTÕES 🔥 */
+.center{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  background:rgba(0,0,0,.4);
+  z-index:10;
+  pointer-events:none; /* ← chave */
+}
+.center .panel{
+  pointer-events:auto; /* ← cliques voltam */
+}
 
-    .hud{
-      position:absolute; top:10px; left:10px; right:10px;
-      display:flex; justify-content:space-between; gap:10px;
-      pointer-events:none;
-      z-index: 5;
-    }
-    .pill{
-      padding: 8px 10px;
-      background: rgba(0,0,0,0.38);
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: 999px;
-      font-weight: 950;
-      font-size: 12.5px;
-      backdrop-filter: blur(6px);
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      letter-spacing:.2px;
-    }
-    .dot{
-      width:10px; height:10px;
-      border-radius:999px;
-      background: var(--gold);
-      border:1px solid rgba(255,255,255,.22);
-      box-shadow: 0 0 14px rgba(212,169,86,.15);
-    }
+.panel{
+  background:rgba(0,0,0,.6);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:18px;
+  padding:20px;
+  width:min(340px,90%);
+  text-align:center;
+}
 
-    .center{
-      position:absolute; inset:0;
-      display:grid;
-      place-items:center;
-      padding:18px;
-      text-align:center;
-      z-index: 10;
-      background: radial-gradient(circle at 50% 20%, rgba(0,0,0,.10), rgba(0,0,0,.40));
-    }
-    .stack{ display:grid; gap:10px; justify-items:center; max-width: 580px; }
+button{
+  width:100%;
+  margin-top:10px;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.3);
+  background:rgba(0,0,0,.6);
+  color:white;
+  font-weight:900;
+  cursor:pointer;
+}
+button:hover{background:rgba(212,169,86,.25)}
 
-    .btnRow{ display:grid; gap:10px; width:min(340px, 100%); }
-    .btn{
-      appearance:none;
-      border:1px solid rgba(212,169,86,.45);
-      border-radius:14px;
-      padding:12px 16px;
-      font-weight:950;
-      font-size:14.5px;
-      background: rgba(0,0,0,.35);
-      color:#fff;
-      cursor:pointer;
-      width:100%;
-    }
-    .btn:hover{ background: rgba(212,169,86,.10); }
+.petal{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  width:38px;
+  height:44px;
+}
+.petal svg{width:100%;height:100%}
 
-    .btn.secondary{
-      background: rgba(255,255,255,0.08);
-      border:1px solid rgba(255,255,255,0.18);
-      color:#fff;
-    }
-    .btn.secondary:hover{ background: rgba(255,255,255,0.12); }
-
-    .small{ font-size: 12px; color: var(--muted); line-height: 1.35; }
-    .small a{ color:#fff; }
-
-    .notice{
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.10);
-      padding: 10px 12px;
-      border-radius: 12px;
-      font-size: 12px;
-      color: rgba(247,243,234,0.80);
-      line-height: 1.35;
-      text-align:left;
-      width:100%;
-    }
-
-    .petal{
-      position:absolute;
-      transform: translate(-50%,-50%);
-      user-select:none;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-      pointer-events:auto;
-      will-change: transform, left, top, filter, opacity;
-    }
-    .petal svg{
-      display:block;
-      width:100%;
-      height:100%;
-      filter: drop-shadow(0 10px 16px rgba(0,0,0,.22));
-    }
-    .petal.gold svg{
-      filter: drop-shadow(0 10px 16px rgba(0,0,0,.22)) drop-shadow(0 0 12px rgba(212,169,86,.14));
-    }
-
-    .toast{
-      position:absolute; bottom:10px; left:10px; right:10px;
-      display:grid; place-items:center;
-      pointer-events:none;
-      font-size:12px;
-      opacity:.92;
-      min-height: 18px;
-      z-index: 6;
-      color: rgba(247,243,234,.92);
-      text-shadow: 0 2px 14px rgba(0,0,0,.6);
-    }
-
-    .code{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      padding: 10px 12px;
-      background: rgba(255,255,255,0.08);
-      border:1px solid rgba(255,255,255,0.14);
-      border-radius: 12px;
-      display:inline-block;
-      margin-top: 8px;
-      letter-spacing: 0.8px;
-      font-weight: 950;
-      color:#fff;
-    }
-
-    .warn{
-      margin-top:10px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(251,113,133,.35);
-      background: rgba(251,113,133,.10);
-      color: rgba(247,243,234,.88);
-      font-size:12px;
-      line-height:1.35;
-      width:100%;
-      text-align:left;
-      display:none;
-    }
-    .warn code{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size:12px;
-    }
-  </style>
+.toast{
+  position:absolute;
+  bottom:10px;
+  left:0;right:0;
+  text-align:center;
+  font-size:13px;
+}
+</style>
 </head>
 
 <body>
-  <div class="bg" id="bg"></div>
-  <div class="vignette"></div>
+<div class="bg"></div>
 
-  <div class="shell">
-    <header>
-      <h1>🌸 Sakura Tap (15s)</h1>
-      <p class="sub"><b>Tap ONLY the gold petals.</b> Pink petals don’t count.</p>
+<div class="shell">
+<header>
+  <h1>🌸 Sakura Tap</h1>
+  <div class="rules">
+    18–24 = Free miso • 25–29 = 50% off • 30+ = Free katsu curry
+  </div>
+</header>
 
-      <div class="rules">
-        🌸 Scoring prizes:
-        <b>18–24</b> = <b>Free miso soup</b> •
-        <b>25–29</b> = <b>50% next purchase</b> •
-        <b>30+</b> = <b>Free katsu curry</b>
-      </div>
-      <div class="rules">Demo mode: <b>1 play/day</b> + <b>1 prize at a time</b> (redeem before playing again).</div>
+<div class="stageWrap">
+<div id="stage">
 
-      <div class="devBadge" id="devBadge" style="display:none;">
-        <span class="devDot"></span> DEV MODE ON (no limits)
-      </div>
-    </header>
+  <div class="hud">
+    <div class="pill">⏱ <span id="time">15.0</span>s</div>
+    <div class="pill">🌸 <span id="score">0</span></div>
+  </div>
 
-    <div class="stageWrap">
-      <div id="stage" aria-label="Game area">
-        <div class="hud">
-          <div class="pill">🌸 ⏱ <span id="time">15.0</span>s</div>
-          <div class="pill"><span class="dot"></span> 🌸 Score: <span id="score">0</span></div>
-        </div>
-
-        <div class="center" id="overlay">
-          <div class="stack">
-            <div style="font-weight:950;font-size:18px;">Ready?</div>
-            <div class="small">Petals fall like a windy day. Tap gold only. It gets chaotic.</div>
-
-            <div class="btnRow">
-              <button class="btn" id="startBtn">Start</button>
-              <button class="btn secondary" id="howBtn">How it works</button>
-              <button class="btn secondary" id="soundBtn">Sound: ON</button>
-              <button class="btn secondary" id="clearLocksBtn" style="display:none;">Reset demo locks (dev)</button>
-            </div>
-
-            <div class="small" id="limitMsg" style="display:none;"></div>
-            <div class="small" id="prizeBlockMsg" style="display:none;"></div>
-
-            <div id="bgWarn" class="warn"></div>
-
-            <div class="notice">
-              Demo mode: limits stored on this device/browser. Official version will validate centrally.
-            </div>
-          </div>
-        </div>
-
-        <div class="toast" id="toast"></div>
-      </div>
+  <div class="center" id="overlay">
+    <div class="panel">
+      <h3>Ready?</h3>
+      <p>Tap ONLY gold petals</p>
+      <button id="startBtn">START</button>
+      <button id="soundBtn">Sound: ON</button>
     </div>
   </div>
 
+  <div class="toast" id="toast"></div>
+</div>
+</div>
+</div>
+
 <script>
-(() => {
-  // ===============================
-  // DEV MODE
-  // ===============================
-  const DEV_MODE = new URLSearchParams(location.search).get("dev") === "1";
-  const devBadge = document.getElementById("devBadge");
-  const clearLocksBtn = document.getElementById("clearLocksBtn");
-  if (DEV_MODE){
-    devBadge.style.display = "inline-flex";
-    clearLocksBtn.style.display = "block";
-  }
+const DEV_MODE = new URLSearchParams(location.search).get("dev")==="1";
 
-  // ===============================
-  // CONFIG
-  // ===============================
-  const BG_PATH = "./assets/images/sakura-bg.png";
-  const GAME_SECONDS = 15;
+const stage=document.getElementById("stage");
+const overlay=document.getElementById("overlay");
+const startBtn=document.getElementById("startBtn");
+const soundBtn=document.getElementById("soundBtn");
+const scoreEl=document.getElementById("score");
+const timeEl=document.getElementById("time");
+const toast=document.getElementById("toast");
 
-  // Difficulty: hard 25, brutal 30
-  const PHASES = [
-    { t: 0,  spawnPerSec: 3.2, goldChance: 0.38, size: 46, fallMin: 90,  fallMax: 160, drag: 0.985, tapCooldownMs: 0 },
-    { t: 5,  spawnPerSec: 5.2, goldChance: 0.30, size: 40, fallMin: 120, fallMax: 220, drag: 0.984, tapCooldownMs: 35 },
-    { t: 10, spawnPerSec: 7.4, goldChance: 0.22, size: 34, fallMin: 150, fallMax: 300, drag: 0.982, tapCooldownMs: 80 },
-  ];
+let running=false,score=0,time=15,petals=[],soundOn=true;
+let last=0;
 
-  const WIND_BASE = 22;
-  const WIND_GUST = 130;
-  const WIND_FREQ = 0.55;
-  const TURB = 0.9;
+function petalSVG(gold){
+  return `
+<svg viewBox="0 0 100 120">
+<defs>
+<radialGradient id="g">
+<stop offset="0%" stop-color="#fff"/>
+<stop offset="60%" stop-color="${gold?'#e9c779':'#ffb4d1'}"/>
+<stop offset="100%" stop-color="${gold?'#d4a956':'#ff8ab8'}"/>
+</radialGradient>
+</defs>
+<path d="M50 6 C72 18 92 42 88 67 C84 92 62 112 50 114 C38 112 16 92 12 67 C8 42 28 18 50 6Z" fill="url(#g)"/>
+</svg>`;
+}
 
-  const DAILY_PLAY_LIMIT = 1;
-
-  function prizeForScore(score) {
-    if (score >= 30) return { tier: 3, label: "Free katsu curry" };
-    if (score >= 25) return { tier: 2, label: "50% next purchase" };
-    if (score >= 18) return { tier: 1, label: "Free miso soup" };
-    return null;
-  }
-
-  // ===============================
-  // ELEMENTS
-  // ===============================
-  const stage = document.getElementById("stage");
-  const overlay = document.getElementById("overlay");
-  const startBtn = document.getElementById("startBtn");
-  const howBtn = document.getElementById("howBtn");
-  const soundBtn = document.getElementById("soundBtn");
-  const scoreEl = document.getElementById("score");
-  const timeEl = document.getElementById("time");
-  const toastEl = document.getElementById("toast");
-  const limitMsg = document.getElementById("limitMsg");
-  const prizeBlockMsg = document.getElementById("prizeBlockMsg");
-  const bgWarn = document.getElementById("bgWarn");
-
-  // ===============================
-  // STATE
-  // ===============================
-  let running = false;
-  let soundOn = true;
-  let score = 0;
-
-  let startTs = 0;
-  let lastTs = null;
-  let rafId = null;
-
-  let spawnAcc = 0;
-  let petals = [];
-  let lastTapAt = 0;
-
-  // ===============================
-  // BACKGROUND CHECK
-  // ===============================
-  (function checkBg(){
-    const img = new Image();
-    img.onload = () => {};
-    img.onerror = () => {
-      bgWarn.style.display = "block";
-      bgWarn.innerHTML =
-        `Background image not found.<br>` +
-        `Expected: <code>assets/images/sakura-bg.png</code><br>` +
-        `(GitHub Pages is case-sensitive.)`;
-      document.getElementById("bg").style.background =
-        "linear-gradient(rgba(0,0,0,.20), rgba(0,0,0,.65)), radial-gradient(circle at 30% 20%, rgba(255,182,210,.18), rgba(0,0,0,.9) 72%)";
-    };
-    img.src = BG_PATH + "?v=" + Date.now();
-  })();
-
-  // ===============================
-  // LOCAL STORAGE (locks)
-  // ===============================
-  const todayKey = () => {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+function spawn(){
+  const p=document.createElement("div");
+  const gold=Math.random()<0.3;
+  p.className="petal";
+  p.innerHTML=petalSVG(gold);
+  p.x=Math.random()*stage.clientWidth;
+  p.y=-40;
+  p.vy=80+Math.random()*120;
+  p.vx=-40+Math.random()*80;
+  p.gold=gold;
+  p.onclick=e=>{
+    if(!running)return;
+    if(!gold)return;
+    score++;scoreEl.textContent=score;
+    toast.textContent="+1 🌸";
+    setTimeout(()=>toast.textContent="",300);
+    p.remove();
+    petals=petals.filter(x=>x!==p);
   };
-  const playsKey = () => `sakuraDemo:plays:${todayKey()}`;
-  const prizeKey = () => `sakuraDemo:unclaimedPrize`;
+  stage.appendChild(p);
+  petals.push(p);
+}
 
-  function getPlaysToday() { return Number(localStorage.getItem(playsKey()) || "0"); }
-  function incPlaysToday() { localStorage.setItem(playsKey(), String(getPlaysToday() + 1)); }
+function loop(ts){
+  if(!running)return;
+  const dt=(ts-last)/1000; last=ts;
+  time-=dt;
+  timeEl.textContent=Math.max(0,time).toFixed(1);
+  if(Math.random()<dt*5)spawn();
 
-  function getUnclaimedPrize(){
-    try{
-      const raw = localStorage.getItem(prizeKey());
-      return raw ? JSON.parse(raw) : null;
-    }catch{ return null; }
-  }
-  function setUnclaimedPrize(obj){ localStorage.setItem(prizeKey(), JSON.stringify(obj)); }
-
-  function clearLocks(){
-    localStorage.removeItem(prizeKey());
-    localStorage.removeItem(playsKey());
-  }
-
-  function updateLocksUI(){
-    if (DEV_MODE){
-      limitMsg.style.display = "none";
-      prizeBlockMsg.style.display = "none";
-      startBtn.disabled = false;
-      startBtn.style.opacity = "1";
-      startBtn.style.cursor = "pointer";
-      return;
+  petals.forEach(p=>{
+    p.y+=p.vy*dt;
+    p.x+=p.vx*dt+Math.sin(ts/300)*30*dt;
+    p.style.left=p.x+"px";
+    p.style.top=p.y+"px";
+    if(p.y>stage.clientHeight+50){
+      p.remove();
+      petals=petals.filter(x=>x!==p);
     }
-
-    const plays = getPlaysToday();
-    const unclaimed = getUnclaimedPrize();
-
-    limitMsg.style.display = "none";
-    prizeBlockMsg.style.display = "none";
-
-    if (unclaimed){
-      prizeBlockMsg.style.display = "block";
-      prizeBlockMsg.innerHTML =
-        `You have an unclaimed prize: <b>${unclaimed.prizeLabel}</b>.<br>` +
-        `Redeem first: <a href="./redeem.html?code=${encodeURIComponent(unclaimed.code)}">Open staff redeem</a>`;
-      startBtn.disabled = true;
-      startBtn.style.opacity = "0.5";
-      startBtn.style.cursor = "not-allowed";
-      return;
-    }
-
-    if (plays >= DAILY_PLAY_LIMIT){
-      limitMsg.style.display = "block";
-      limitMsg.textContent = "You’ve already played today. Scan again tomorrow 🌸";
-      startBtn.disabled = true;
-      startBtn.style.opacity = "0.5";
-      startBtn.style.cursor = "not-allowed";
-      return;
-    }
-
-    startBtn.disabled = false;
-    startBtn.style.opacity = "1";
-    startBtn.style.cursor = "pointer";
-  }
-
-  // ===============================
-  // SOUND (tap)
-  // ===============================
-  let audioCtx = null;
-  function ensureAudio(){
-    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if(audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
-  }
-  function tapSound(ok){
-    if(!soundOn) return;
-    ensureAudio();
-    const t = audioCtx.currentTime;
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-
-    o.type = "triangle";
-    o.frequency.setValueAtTime(ok ? 920 : 250, t);
-    o.frequency.exponentialRampToValueAtTime(ok ? 1500 : 320, t + 0.05);
-
-    g.gain.setValueAtTime(ok ? 0.07 : 0.09, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.075);
-
-    o.connect(g); g.connect(audioCtx.destination);
-    o.start(t); o.stop(t + 0.09);
-  }
-
-  // ===============================
-  // HELPERS
-  // ===============================
-  function phaseForElapsed(elapsed){
-    if (elapsed >= PHASES[2].t) return PHASES[2];
-    if (elapsed >= PHASES[1].t) return PHASES[1];
-    return PHASES[0];
-  }
-
-  function windAtTime(t){
-    const gust = Math.sin(t * WIND_FREQ) * 0.7 + Math.sin(t * (WIND_FREQ * 2.3 + 0.1)) * 0.3;
-    return WIND_BASE + gust * WIND_GUST;
-  }
-
-  function setToast(html){
-    toastEl.innerHTML = html || "";
-  }
-
-  function resetHud(){
-    score = 0;
-    scoreEl.textContent = "0";
-    timeEl.textContent = GAME_SECONDS.toFixed(1);
-  }
-
-  function showHow(){
-    alert(
-`Tap ONLY gold petals (pink petals don’t count).
-15 seconds.
-Prizes:
-• 18–24: Free miso soup
-• 25–29: 50% next purchase
-• 30+: Free katsu curry`
-    );
-  }
-
-  // ===============================
-  // SVG PETAL (realistic-ish)
-  // ===============================
-  function petalSVG(isGold){
-    const c1 = isGold ? "#fff3d6" : "#fff";
-    const c2 = isGold ? "#e9c779" : "#ffb4d1";
-    const c3 = isGold ? "#d4a956" : "#ff8ab8";
-    const vein = isGold ? "rgba(255,255,255,.45)" : "rgba(255,255,255,.55)";
-
-    return `
-      <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs>
-          <radialGradient id="g" cx="30%" cy="25%" r="80%">
-            <stop offset="0%" stop-color="${c1}"/>
-            <stop offset="55%" stop-color="${c2}"/>
-            <stop offset="100%" stop-color="${c3}"/>
-          </radialGradient>
-          <linearGradient id="s" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="rgba(255,255,255,.35)"/>
-            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-          </linearGradient>
-        </defs>
-
-        <path d="M50 6
-                 C72 18, 92 42, 88 67
-                 C84 92, 62 112, 50 114
-                 C38 112, 16 92, 12 67
-                 C8 42, 28 18, 50 6 Z"
-              fill="url(#g)"/>
-
-        <path d="M36 28
-                 C54 20, 74 42, 70 66
-                 C66 88, 50 96, 40 92
-                 C28 88, 20 66, 24 50
-                 C26 40, 30 32, 36 28 Z"
-              fill="url(#s)" opacity=".75"/>
-
-        <path d="M50 18 C46 40, 46 66, 50 108" stroke="${vein}" stroke-width="2" opacity=".35" fill="none"/>
-        <path d="M50 42 C40 54, 32 64, 26 72" stroke="${vein}" stroke-width="1.6" opacity=".25" fill="none"/>
-        <path d="M50 42 C60 54, 68 64, 74 72" stroke="${vein}" stroke-width="1.6" opacity=".25" fill="none"/>
-      </svg>
-    `;
-  }
-
-  // ===============================
-  // PETALS
-  // ===============================
-  function spawnPetal(elapsed){
-    const cfg = phaseForElapsed(elapsed);
-    const rect = stage.getBoundingClientRect();
-
-    const isGold = Math.random() < cfg.goldChance;
-
-    const size = Math.max(26, Math.round(cfg.size + (Math.random()*4 - 2)));
-    const x = 20 + Math.random() * (rect.width - 40);
-    const y = -40 - Math.random()*60;
-
-    const vy = cfg.fallMin + Math.random() * (cfg.fallMax - cfg.fallMin);
-    const vx = (Math.random()*2 - 1) * 25;
-
-    const rot = Math.random()*360;
-    const rotSpeed = (Math.random()*240 - 120);
-
-    const swayAmp = 10 + Math.random()*22;
-    const swayFreq = 1.2 + Math.random()*1.8;
-    const phase = Math.random() * Math.PI * 2;
-
-    const liftAmp = 6 + Math.random()*10;
-    const liftFreq = 1.8 + Math.random()*2.1;
-
-    const el = document.createElement("div");
-    el.className = "petal " + (isGold ? "gold" : "pink");
-    el.style.width = size + "px";
-    el.style.height = Math.round(size * 1.1) + "px";
-    el.innerHTML = petalSVG(isGold);
-    stage.appendChild(el);
-
-    const p = {
-      el, isGold,
-      x, y,
-      vx, vy,
-      rot, rotSpeed,
-      swayAmp, swayFreq, phase,
-      liftAmp, liftFreq,
-      scale: 0.90 + Math.random()*0.22,
-      opacity: 0.85 + Math.random()*0.15
-    };
-    el.style.opacity = p.opacity;
-
-    el.addEventListener("pointerdown", (e) => {
-      if(!running) return;
-      e.preventDefault();
-
-      const now = performance.now();
-      const cd = cfg.tapCooldownMs || 0;
-      if (cd && (now - lastTapAt) < cd) return;
-      lastTapAt = now;
-
-      if(!p.isGold){
-        tapSound(false);
-        p.el.style.filter = "drop-shadow(0 0 14px rgba(255,80,80,.35))";
-        setTimeout(()=> { if(p.el) p.el.style.filter = ""; }, 140);
-        return;
-      }
-
-      tapSound(true);
-      score += 1;
-      scoreEl.textContent = String(score);
-      removePetal(p);
-
-      setToast("🌸 +1");
-      clearTimeout(setToast._t);
-      setToast._t = setTimeout(() => setToast(""), 260);
-    }, { passive:false });
-
-    petals.push(p);
-  }
-
-  function removePetal(p){
-    p.el.remove();
-    petals = petals.filter(x => x !== p);
-  }
-  function clearAllPetals(){
-    petals.forEach(p => p.el.remove());
-    petals = [];
-  }
-
-  // ===============================
-  // LOOP
-  // ===============================
-  function loop(ts){
-    if(!running) return;
-    if(lastTs == null) lastTs = ts;
-
-    const dt = Math.min(0.033, (ts - lastTs)/1000);
-    lastTs = ts;
-
-    const elapsed = (ts - startTs)/1000;
-    const cfg = phaseForElapsed(elapsed);
-
-    const tLeft = Math.max(0, GAME_SECONDS - elapsed);
-    timeEl.textContent = tLeft.toFixed(1);
-
-    spawnAcc += dt * cfg.spawnPerSec;
-    while(spawnAcc >= 1){
-      spawnPetal(elapsed);
-      spawnAcc -= 1;
-    }
-
-    const rect = stage.getBoundingClientRect();
-    const w = windAtTime(elapsed);
-
-    for(const p of [...petals]){
-      const turb = Math.sin((elapsed * 3.7) + p.phase) * TURB * 20;
-      const sway = Math.sin((elapsed * p.swayFreq) + p.phase) * p.swayAmp;
-      const lift = Math.sin((elapsed * p.liftFreq) + p.phase) * p.liftAmp;
-
-      p.vx += (w * 0.35 + turb) * dt;
-      p.vx *= cfg.drag;
-
-      p.vy += 12 * dt;
-      p.vy *= (cfg.drag + 0.002);
-
-      p.x += (p.vx * dt) + sway * dt * 35;
-      p.y += (p.vy * dt) - lift * dt * 18;
-
-      p.rot += (p.rotSpeed + (p.vx * 0.35)) * dt;
-
-      if(p.x < 10){ p.x = 10; p.vx *= -0.55; }
-      if(p.x > rect.width - 10){ p.x = rect.width - 10; p.vx *= -0.55; }
-
-      p.el.style.left = p.x + "px";
-      p.el.style.top = p.y + "px";
-      p.el.style.transform = `translate(-50%,-50%) rotate(${p.rot}deg) scale(${p.scale})`;
-
-      if(p.y > rect.height + 120) removePetal(p);
-    }
-
-    if(tLeft <= 0.001){
-      endGame();
-      return;
-    }
-
-    rafId = requestAnimationFrame(loop);
-  }
-
-  // ===============================
-  // GAME START/END
-  // ===============================
-  function startGame(){
-    updateLocksUI();
-
-    if (!DEV_MODE){
-      const plays = getPlaysToday();
-      const unclaimed = getUnclaimedPrize();
-      if(unclaimed) return;
-      if(plays >= DAILY_PLAY_LIMIT) return;
-      incPlaysToday();
-    }
-
-    ensureAudio();
-    resetHud();
-    clearAllPetals();
-    setToast("");
-
-    running = true;
-    overlay.style.display = "none";
-
-    startTs = performance.now();
-    lastTs = null;
-    spawnAcc = 0;
-    lastTapAt = 0;
-
-    rafId = requestAnimationFrame(loop);
-  }
-
-  function endGame(){
-    running = false;
-    if(rafId) cancelAnimationFrame(rafId);
-    rafId = null;
-
-    clearAllPetals();
-
-    const prize = prizeForScore(score);
-    overlay.style.display = "grid";
-
-    if(!prize){
-      overlay.innerHTML = `
-        <div class="stack">
-          <div style="font-weight:950;font-size:18px;">Time!</div>
-          <div>🌸 Score: <b style="color:var(--gold)">${score}</b></div>
-          <div style="font-weight:950;font-size:16px;margin-top:6px;">No prize today</div>
-          <div class="small">Try again tomorrow 🌸</div>
-          <button class="btn" id="okBtn">OK</button>
-          <div class="small">${DEV_MODE ? "DEV MODE: play unlimited ✅" : `Limit: ${DAILY_PLAY_LIMIT} play/day per device (demo mode).`}</div>
-        </div>
-      `;
-      document.getElementById("okBtn").onclick = () => location.reload();
-      return;
-    }
-
-    const voucher = makeVoucher(score);
-    if (!DEV_MODE) setUnclaimedPrize(voucher);
-
-    overlay.innerHTML = `
-      <div class="stack">
-        <div style="font-weight:950;font-size:18px;">You won! 🎉</div>
-        <div>🌸 Score: <b style="color:var(--gold)">${score}</b></div>
-
-        <div style="margin-top:6px;">
-          <div style="font-weight:950;font-size:16px;">
-            Congratulations! You won <span style="color:var(--gold)">${voucher.prizeLabel}</span> to collect now in store.
-          </div>
-          <div class="small" style="margin-top:6px;">Show this code at the counter.</div>
-          <div class="code">${voucher.code}</div>
-          <div class="small" style="margin-top:6px;">
-            ${DEV_MODE ? "DEV MODE: voucher not saved (won’t block)." : "One prize at a time: redeem before playing again."}
-          </div>
-        </div>
-
-        <button class="btn" id="redeemBtn">Open Staff Redeem</button>
-        <button class="btn secondary" id="shareBtn">Share</button>
-
-        <div class="small">Demo mode (no server). Official campaign will validate centrally.</div>
-      </div>
-    `;
-
-    document.getElementById("redeemBtn").onclick = () => {
-      location.href = "./redeem.html?code=" + encodeURIComponent(voucher.code);
-    };
-
-    document.getElementById("shareBtn").onclick = async () => {
-      const text = `I scored ${score} in the Sakura Tap game 🌸`;
-      const shareData = { title: "Sakura Tap", text, url: location.href };
-      try {
-        if (navigator.share) await navigator.share(shareData);
-        else {
-          await navigator.clipboard.writeText(`${text} ${location.href}`);
-          alert("Copied to clipboard!");
-        }
-      } catch {}
-    };
-  }
-
-  // ===============================
-  // VOUCHER HELPERS
-  // ===============================
-  function randomCode(len=8){
-    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let out = "";
-    for (let i=0;i<len;i++) out += alphabet[Math.floor(Math.random()*alphabet.length)];
-    return out;
-  }
-
-  function makeVoucher(score){
-    const p = prizeForScore(score);
-    return {
-      code: `YMS-SAKURA-${randomCode(8)}`,
-      prizeTier: p.tier,
-      prizeLabel: p.label,
-      score,
-      createdAt: new Date().toISOString(),
-      status: "UNCLAIMED"
-    };
-  }
-
-  // ===============================
-  // EVENTS
-  // ===============================
-  startBtn.addEventListener("click", startGame);
-  howBtn.addEventListener("click", showHow);
-
-  soundBtn.addEventListener("click", () => {
-    soundOn = !soundOn;
-    soundBtn.textContent = `Sound: ${soundOn ? "ON" : "OFF"}`;
-    if(soundOn) ensureAudio();
   });
 
-  clearLocksBtn.addEventListener("click", () => {
-    clearLocks();
-    alert("Reset done ✅");
-    location.reload();
-  });
+  if(time<=0){running=false;overlay.style.display="grid";}
+  else requestAnimationFrame(loop);
+}
 
-  updateLocksUI();
-})();
+startBtn.onclick=()=>{
+  overlay.style.display="none";
+  score=0;time=15;scoreEl.textContent=0;
+  petals.forEach(p=>p.remove());petals=[];
+  running=true;last=performance.now();
+  requestAnimationFrame(loop);
+};
+
+soundBtn.onclick=()=>{
+  soundOn=!soundOn;
+  soundBtn.textContent="Sound: "+(soundOn?"ON":"OFF");
+};
 </script>
 </body>
 </html>
