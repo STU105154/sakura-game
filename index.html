@@ -14,12 +14,11 @@
       --ok:#6ee7b7;
       --bad:#fb7185;
     }
-
     *{ box-sizing:border-box; }
-    html,body{ margin:0; padding:0; height:100%; background:#000; color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+    html,body{ margin:0; padding:0; height:100%; background:#000; color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
     body{ overflow:hidden; touch-action:manipulation; }
 
-    /* Background */
     .bg{
       position:fixed; inset:0;
       background:
@@ -36,7 +35,6 @@
       pointer-events:none;
     }
 
-    /* UI */
     .hud{
       position:fixed; left:12px; right:12px; top:12px;
       display:flex; gap:10px; align-items:stretch; justify-content:space-between;
@@ -95,6 +93,7 @@
     }
     .ruleRow{ display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:13px; }
     .ruleRow b{ color:var(--text); font-weight:650; }
+
     .btnRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
     button{
       appearance:none;
@@ -119,13 +118,8 @@
       color:rgba(247,243,234,.55);
     }
 
-    /* Game field */
-    .field{
-      position:fixed; inset:0;
-      overflow:hidden;
-    }
+    .field{ position:fixed; inset:0; overflow:hidden; }
 
-    /* Petal styles */
     .petal{
       position:absolute;
       width:64px; height:64px;
@@ -154,7 +148,7 @@
       transform: rotate(-10deg);
     }
 
-    /* Highlight (ONLY TAP THIS) */
+    /* Highlighted target */
     .target{
       border-color: rgba(212,169,86,.7);
       filter: drop-shadow(0 0 12px rgba(212,169,86,.55)) drop-shadow(0 0 28px rgba(255,255,255,.12));
@@ -165,7 +159,7 @@
       50%{ transform: scale(1.08) rotate(18deg); }
     }
 
-    /* Wrong tap feedback */
+    /* Wrong tap feedback (ignored tap) */
     .wrongFlash{
       animation: wrong 220ms ease-in-out 1;
     }
@@ -175,7 +169,6 @@
       100%{ filter:none; }
     }
 
-    /* Small floating particles */
     .spark{
       position:absolute;
       width:8px; height:8px;
@@ -192,7 +185,6 @@
       100%{ opacity:0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.2); }
     }
 
-    /* End screen prize */
     .prizeBig{
       font-size:18px;
       font-weight:800;
@@ -201,7 +193,6 @@
     }
     .prizeBig.bad{ color:var(--bad); }
 
-    /* Hide modal when playing */
     .hidden{ display:none !important; }
   </style>
 </head>
@@ -219,7 +210,7 @@
       </div>
     </div>
 
-    <div class="pill" id="difficultyPill">Difficulty: <b id="diffText">Easy</b></div>
+    <div class="pill">Rule: <b>Tap ONLY highlighted</b></div>
 
     <div class="card right">
       <div>
@@ -229,11 +220,10 @@
     </div>
   </div>
 
-  <!-- Start / End Modal -->
   <div class="centerPanel" id="overlay">
     <div class="modal" id="modal">
       <h1>Sakura Tap (15s)</h1>
-      <p>Tap only on the <b style="color:var(--gold)">highlighted</b> petal. The game gets harder as it goes on.</p>
+      <p><b style="color:var(--gold)">Tap only on the highlighted petals.</b> Other taps are ignored. The game becomes harder as it goes on.</p>
 
       <div class="rules">
         <div class="ruleRow"><span>18–24</span> <b>Free miso soup</b></div>
@@ -241,32 +231,20 @@
         <div class="ruleRow"><span>30+</span> <b>Free katsu curry</b></div>
       </div>
 
-      <p>
-        Difficulty scaling is tuned so it’s <b>hard</b> to reach 25 and <b>really hard</b> to reach 30:
-        smaller targets, more decoys, faster switching, and movement.
-      </p>
-
       <div class="btnRow">
         <button id="startBtn">Start</button>
         <button class="ghost" id="muteBtn">Sound: ON</button>
       </div>
 
       <div class="note">
-        Tip: Use one finger, quick taps. Wrong taps cost points + a tiny time penalty.
+        Difficulty scaling: smaller target + more decoys + faster switching + movement (hard to reach 25, brutal to reach 30).
       </div>
     </div>
   </div>
 
   <script>
-    /* ============================
-       GAME CONFIG (tuned)
-       ============================ */
     const GAME_SECONDS = 15.0;
 
-    // Difficulty phases (seconds elapsed):
-    // 0–5  Easy: fewer petals, bigger target, slow switch
-    // 5–10 Medium: more petals, smaller, movement starts, faster switch
-    // 10–15 Hard: lots of decoys, small & fast moving, target switches very fast
     function getPhase(elapsed){
       if(elapsed < 5) return "EASY";
       if(elapsed < 10) return "MED";
@@ -274,63 +252,22 @@
     }
 
     const PHASE_SETTINGS = {
-      EASY: {
-        label: "Easy",
-        petals: 5,
-        targetSize: 68,
-        decoySize: 64,
-        switchMs: 900,
-        move: false,
-        moveSpeed: 0,
-        points: 1,
-        wrongPenalty: 1,
-        timePenalty: 0.10,
-      },
-      MED: {
-        label: "Medium",
-        petals: 7,
-        targetSize: 56,
-        decoySize: 54,
-        switchMs: 700,
-        move: true,
-        moveSpeed: 0.55,
-        points: 1,
-        wrongPenalty: 2,
-        timePenalty: 0.14,
-      },
-      HARD: {
-        label: "Hard",
-        petals: 10,
-        targetSize: 46,
-        decoySize: 44,
-        switchMs: 520,
-        move: true,
-        moveSpeed: 0.95,
-        points: 1,
-        wrongPenalty: 3,
-        timePenalty: 0.18,
-      }
+      EASY: { label:"Easy",   petals:5,  targetSize:70, decoySize:64, switchMs:900, move:false, moveSpeed:0 },
+      MED:  { label:"Medium", petals:7,  targetSize:56, decoySize:52, switchMs:700, move:true,  moveSpeed:0.55 },
+      HARD: { label:"Hard",   petals:10, targetSize:46, decoySize:42, switchMs:520, move:true,  moveSpeed:0.95 }
     };
 
-    // Extra “anti-30” tuning:
-    // - In HARD phase: target is only reliably tappable for a short window before it swaps.
-    // - A tiny global cooldown stops ultra-spam tapping from inflating score.
+    // Anti-farm (keeps 30 very hard)
     const GLOBAL_TAP_COOLDOWN_MS = 95;
 
-    /* ============================
-       DOM
-       ============================ */
     const field = document.getElementById("field");
     const overlay = document.getElementById("overlay");
     const startBtn = document.getElementById("startBtn");
     const muteBtn = document.getElementById("muteBtn");
     const scoreEl = document.getElementById("score");
     const timeEl = document.getElementById("time");
-    const diffText = document.getElementById("diffText");
+    const modal = document.getElementById("modal");
 
-    /* ============================
-       State
-       ============================ */
     let running = false;
     let soundOn = true;
 
@@ -344,31 +281,20 @@
     let switchTimer = null;
 
     let lastTapAt = 0;
-    let extraTimeDebt = 0; // penalties reduce time
 
-    /* ============================
-       Sound (tap noise) — no files
-       ============================ */
+    // SOUND
     let audioCtx = null;
     function ensureAudio(){
-      if(!audioCtx){
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if(audioCtx.state === "suspended"){
-        audioCtx.resume().catch(()=>{});
-      }
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if(audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
     }
     function tapSound(ok){
       if(!soundOn) return;
       ensureAudio();
-      if(!audioCtx) return;
-
       const t = audioCtx.currentTime;
       const o = audioCtx.createOscillator();
       const g = audioCtx.createGain();
 
-      // Slightly nicer “click”:
-      // correct: higher + softer; wrong: lower + sharper
       const freq = ok ? 880 : 220;
       o.type = "triangle";
       o.frequency.setValueAtTime(freq, t);
@@ -377,34 +303,18 @@
       g.gain.setValueAtTime(ok ? 0.07 : 0.10, t);
       g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
 
-      o.connect(g);
-      g.connect(audioCtx.destination);
-      o.start(t);
-      o.stop(t + 0.08);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t); o.stop(t + 0.08);
     }
 
-    /* ============================
-       Helpers
-       ============================ */
-    function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
-    function rand(min, max){ return Math.random() * (max - min) + min; }
-
-    function viewport(){
-      return {
-        w: window.innerWidth,
-        h: window.innerHeight
-      };
-    }
-
-    function setDifficultyLabel(phase){
-      diffText.textContent = PHASE_SETTINGS[phase].label;
-    }
+    function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
+    function rand(min,max){ return Math.random()*(max-min)+min; }
+    function viewport(){ return { w: window.innerWidth, h: window.innerHeight }; }
 
     function setScore(n){
       score = Math.max(0, n);
       scoreEl.textContent = score;
     }
-
     function setTime(sec){
       timeEl.textContent = sec.toFixed(1);
     }
@@ -427,9 +337,6 @@
       targetIndex = -1;
     }
 
-    /* ============================
-       Petal creation / placement
-       ============================ */
     function createPetal(){
       const el = document.createElement("div");
       el.className = "petal";
@@ -443,8 +350,6 @@
     function placePetal(el, size){
       const { w, h } = viewport();
       const pad = 18;
-
-      // avoid top HUD area a bit
       const topSafe = 78;
 
       el.style.width = size + "px";
@@ -457,59 +362,19 @@
       el.style.left = x + "px";
       el.style.top = y + "px";
 
-      // random rotation variety
       const rot = rand(-40, 40);
       el.style.transform = `rotate(${rot}deg)`;
       el._rot = rot;
     }
 
-    function initPetalsForPhase(phase){
-      clearTimeout(switchTimer);
-      switchTimer = null;
-
-      const cfg = PHASE_SETTINGS[phase];
-
-      // Ensure we have exactly cfg.petals elements
-      clearField();
-      for(let i=0;i<cfg.petals;i++){
-        const p = createPetal();
-        petals.push(p);
-      }
-
-      // Place them
-      for(let i=0;i<petals.length;i++){
-        const isTarget = (i === 0);
-        const size = isTarget ? cfg.targetSize : cfg.decoySize;
-        placePetal(petals[i], size);
-
-        if(cfg.move){
-          petals[i]._vx = rand(-1, 1) * cfg.moveSpeed;
-          petals[i]._vy = rand(-1, 1) * cfg.moveSpeed;
-        }else{
-          petals[i]._vx = 0; petals[i]._vy = 0;
-        }
-      }
-
-      // Pick a target
-      targetIndex = Math.floor(Math.random() * petals.length);
-      applyTarget(targetIndex, phase);
-
-      // Attach taps
-      petals.forEach((el, idx) => {
-        el.onclick = (e) => handleTap(e, idx);
-      });
-
-      // start switching target
-      scheduleTargetSwitch();
-    }
-
     function applyTarget(idx, phase){
+      const cfg = PHASE_SETTINGS[phase];
       petals.forEach((p, i) => {
-        p.classList.toggle("target", i === idx);
-        p.dataset.isTarget = (i === idx) ? "1" : "0";
-        // ensure target uses targetSize
-        const cfg = PHASE_SETTINGS[phase];
-        const size = (i === idx) ? cfg.targetSize : cfg.decoySize;
+        const isT = i === idx;
+        p.classList.toggle("target", isT);
+        p.dataset.isTarget = isT ? "1" : "0";
+
+        const size = isT ? cfg.targetSize : cfg.decoySize;
         p.style.width = size + "px";
         p.style.height = size + "px";
       });
@@ -526,15 +391,12 @@
       switchTimer = setTimeout(() => {
         if(!running) return;
 
-        // re-pick target
         let next = Math.floor(Math.random() * petals.length);
-        if(next === targetIndex && petals.length > 1){
-          next = (next + 1) % petals.length;
-        }
+        if(next === targetIndex && petals.length > 1) next = (next + 1) % petals.length;
         targetIndex = next;
         applyTarget(targetIndex, phase);
 
-        // in HARD phase, also “teleport” a few decoys to increase chaos
+        // chaos boost in HARD: teleport some petals (including decoys)
         if(phase === "HARD"){
           const moves = Math.floor(rand(2, 5));
           for(let i=0;i<moves;i++){
@@ -548,9 +410,40 @@
       }, cfg.switchMs);
     }
 
-    /* ============================
-       Movement loop
-       ============================ */
+    function initPetalsForPhase(phase){
+      clearTimeout(switchTimer);
+      switchTimer = null;
+
+      const cfg = PHASE_SETTINGS[phase];
+
+      clearField();
+      for(let i=0;i<cfg.petals;i++){
+        const p = createPetal();
+        petals.push(p);
+      }
+
+      for(let i=0;i<petals.length;i++){
+        placePetal(petals[i], cfg.decoySize);
+
+        if(cfg.move){
+          petals[i]._vx = rand(-1, 1) * cfg.moveSpeed;
+          petals[i]._vy = rand(-1, 1) * cfg.moveSpeed;
+        }else{
+          petals[i]._vx = 0; petals[i]._vy = 0;
+        }
+      }
+
+      targetIndex = Math.floor(Math.random() * petals.length);
+      applyTarget(targetIndex, phase);
+
+      // IMPORTANT: only target counts
+      petals.forEach((el, idx) => {
+        el.onclick = (e) => handleTap(e, idx);
+      });
+
+      scheduleTargetSwitch();
+    }
+
     function movePetals(){
       const elapsed = (performance.now() - startTs) / 1000;
       const phase = getPhase(elapsed);
@@ -564,11 +457,9 @@
       for(const p of petals){
         const size = parseFloat(getComputedStyle(p).width) || 50;
 
-        // subtle drift + bounce
         p._x += p._vx;
         p._y += p._vy;
 
-        // slight random jitter in HARD
         if(phase === "HARD"){
           p._x += rand(-0.35, 0.35);
           p._y += rand(-0.25, 0.25);
@@ -584,9 +475,10 @@
       }
     }
 
-    /* ============================
-       Tap handling
-       ============================ */
+    /* STEP 2 IMPLEMENTED:
+       ✅ Tap only on the highlighted petals
+       - if tap is NOT target: IGNORE (no score change, optional error feedback)
+    */
     function handleTap(ev, idx){
       if(!running) return;
 
@@ -596,53 +488,45 @@
 
       const elapsed = (performance.now() - startTs) / 1000;
       const phase = getPhase(elapsed);
-      const cfg = PHASE_SETTINGS[phase];
-      setDifficultyLabel(phase);
 
       const isTarget = (idx === targetIndex);
 
-      // Tap position
       const rect = petals[idx].getBoundingClientRect();
       const x = rect.left + rect.width/2;
       const y = rect.top + rect.height/2;
 
-      if(isTarget){
-        tapSound(true);
-        spawnSpark(x, y, true);
-        setScore(score + cfg.points);
-
-        // Make it harder to “farm”:
-        // In MED/HARD, after a correct tap, instantly switch target
-        if(phase !== "EASY"){
-          let next = Math.floor(Math.random() * petals.length);
-          if(next === targetIndex && petals.length > 1) next = (next + 1) % petals.length;
-          targetIndex = next;
-          applyTarget(targetIndex, phase);
-
-          // also move some petals to new positions in HARD
-          if(phase === "HARD"){
-            for(let k=0;k<3;k++){
-              const j = Math.floor(Math.random() * petals.length);
-              const isT = (j === targetIndex);
-              placePetal(petals[j], isT ? cfg.targetSize : cfg.decoySize);
-            }
-          }
-        }
-      }else{
+      if(!isTarget){
+        // IGNORE tap (rule)
         tapSound(false);
         spawnSpark(x, y, false);
         petals[idx].classList.add("wrongFlash");
         setTimeout(()=> petals[idx].classList.remove("wrongFlash"), 240);
+        return;
+      }
 
-        // penalties (this is what makes 25/30 hard)
-        setScore(score - cfg.wrongPenalty);
-        extraTimeDebt += cfg.timePenalty;
+      // target tap counts
+      tapSound(true);
+      spawnSpark(x, y, true);
+      setScore(score + 1);
+
+      // make harder: in MED/HARD switch instantly after each correct tap
+      if(phase !== "EASY"){
+        let next = Math.floor(Math.random() * petals.length);
+        if(next === targetIndex && petals.length > 1) next = (next + 1) % petals.length;
+        targetIndex = next;
+        applyTarget(targetIndex, phase);
+
+        if(phase === "HARD"){
+          for(let k=0;k<3;k++){
+            const j = Math.floor(Math.random() * petals.length);
+            const isT = (j === targetIndex);
+            const cfg = PHASE_SETTINGS[phase];
+            placePetal(petals[j], isT ? cfg.targetSize : cfg.decoySize);
+          }
+        }
       }
     }
 
-    /* ============================
-       Game lifecycle
-       ============================ */
     function startGame(){
       ensureAudio();
 
@@ -651,47 +535,34 @@
 
       setScore(0);
       remaining = GAME_SECONDS;
-      extraTimeDebt = 0;
       setTime(remaining);
 
       startTs = performance.now();
       lastTapAt = 0;
 
-      // Initial phase setup
       const phase = getPhase(0);
-      setDifficultyLabel(phase);
       initPetalsForPhase(phase);
 
-      // Main loop
       const tick = () => {
         if(!running) return;
 
         const now = performance.now();
         const elapsed = (now - startTs) / 1000;
 
-        // Update phase if crossed boundary (rebuild petals so it “feels” harder)
-        const phaseNow = getPhase(elapsed);
-        setDifficultyLabel(phaseNow);
-
-        // Remaining time with penalties
-        const timeSpent = elapsed + extraTimeDebt;
-        remaining = clamp(GAME_SECONDS - timeSpent, 0, GAME_SECONDS);
+        remaining = clamp(GAME_SECONDS - elapsed, 0, GAME_SECONDS);
         setTime(remaining);
 
-        // Motion
         movePetals();
 
-        // If phase changed exactly at 5 or 10, rebuild to apply new counts/sizes
-        // Simple check: rebuild near boundaries
+        // rebuild at phase boundaries so difficulty jumps clearly
         if(Math.abs(elapsed - 5) < 0.016 || Math.abs(elapsed - 10) < 0.016){
-          initPetalsForPhase(phaseNow);
+          initPetalsForPhase(getPhase(elapsed));
         }
 
         if(remaining <= 0.001){
           endGame();
           return;
         }
-
         rafId = requestAnimationFrame(tick);
       };
       rafId = requestAnimationFrame(tick);
@@ -701,7 +572,7 @@
       if(s >= 30) return { ok:true, name:"Free katsu curry", msg:"Congratulations! You won a free katsu curry to collect now in store." };
       if(s >= 25) return { ok:true, name:"50% next purchase", msg:"Congratulations! You won 50% off your next purchase to collect now in store." };
       if(s >= 18) return { ok:true, name:"Free miso soup", msg:"Congratulations! You won a free miso soup to collect now in store." };
-      return { ok:false, name:"No prize this time", msg:"So close. Try again — tap only the highlighted petals!" };
+      return { ok:false, name:"No prize this time", msg:"Try again — tap ONLY the highlighted petals!" };
     }
 
     function endGame(){
@@ -709,13 +580,10 @@
       cancelAnimationFrame(rafId);
       clearTimeout(switchTimer);
 
-      // freeze field
-      // (optional: keep petals visible)
       const prize = getPrizeForScore(score);
 
-      // show end modal
       overlay.classList.remove("hidden");
-      document.getElementById("modal").innerHTML = `
+      modal.innerHTML = `
         <h1>Time’s up!</h1>
         <p class="muted">Final score: <b style="color:var(--gold)">${score}</b></p>
 
@@ -733,10 +601,9 @@
           <button class="ghost" id="muteBtn2">Sound: ${soundOn ? "ON" : "OFF"}</button>
         </div>
 
-        <div class="note">Note: Difficulty scales over the 15 seconds — it’s designed to be hard to hit 25 and very hard to hit 30.</div>
+        <div class="note">Rule enforced: ONLY taps on highlighted petals count.</div>
       `;
 
-      // rebind buttons
       document.getElementById("restartBtn").onclick = () => {
         clearField();
         startGame();
@@ -747,19 +614,14 @@
     function toggleSound(btn){
       soundOn = !soundOn;
       if(btn) btn.textContent = `Sound: ${soundOn ? "ON" : "OFF"}`;
-      if(muteBtn) muteBtn.textContent = `Sound: ${soundOn ? "ON" : "OFF"}`;
+      muteBtn.textContent = `Sound: ${soundOn ? "ON" : "OFF"}`;
     }
 
-    /* ============================
-       Bind UI
-       ============================ */
     startBtn.addEventListener("click", startGame);
     muteBtn.addEventListener("click", () => toggleSound(muteBtn));
 
-    // Make sure resize doesn’t break bounds badly
     window.addEventListener("resize", () => {
       if(!running) return;
-      // just gently re-place all petals inside new bounds
       const elapsed = (performance.now() - startTs) / 1000;
       const phase = getPhase(elapsed);
       const cfg = PHASE_SETTINGS[phase];
