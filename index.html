@@ -49,6 +49,7 @@
       overflow:hidden;
       backdrop-filter: blur(10px);
     }
+
     header{ padding: 16px 16px 10px; }
     h1{ font-size: 20px; margin: 0; letter-spacing:.2px; }
     .sub{
@@ -66,6 +67,27 @@
       line-height: 1.35;
     }
     .rules b{ color: var(--text); }
+
+    .devBadge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin-top:10px;
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(247,243,234,.92);
+      padding: 7px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.35);
+      width: fit-content;
+    }
+    .devDot{
+      width:10px; height:10px;
+      border-radius:999px;
+      background: rgba(60,240,150,.9);
+      box-shadow: 0 0 14px rgba(60,240,150,.18);
+    }
 
     .stageWrap{ padding: 0 16px 16px; }
     #stage{
@@ -154,7 +176,7 @@
       width:100%;
     }
 
-    /* ===== Realistic petals (SVG inside) ===== */
+    /* ===== Realistic petals (SVG) ===== */
     .petal{
       position:absolute;
       transform: translate(-50%,-50%);
@@ -164,15 +186,12 @@
       pointer-events:auto;
       will-change: transform, left, top, filter, opacity;
     }
-
     .petal svg{
       display:block;
       width:100%;
       height:100%;
       filter: drop-shadow(0 10px 16px rgba(0,0,0,.22));
     }
-
-    /* Gold highlight = same shape, different fill, subtle glow */
     .petal.gold svg{
       filter: drop-shadow(0 10px 16px rgba(0,0,0,.22)) drop-shadow(0 0 12px rgba(212,169,86,.14));
     }
@@ -238,6 +257,10 @@
         <b>30+</b> = <b>Free katsu curry</b>
       </div>
       <div class="rules">Demo mode: <b>1 play/day</b> + <b>1 prize at a time</b> (redeem before playing again).</div>
+
+      <div class="devBadge" id="devBadge" style="display:none;">
+        <span class="devDot"></span> DEV MODE ON (no limits)
+      </div>
     </header>
 
     <div class="stageWrap">
@@ -256,6 +279,7 @@
               <button class="btn" id="startBtn">Start</button>
               <button class="btn secondary" id="howBtn">How it works</button>
               <button class="btn secondary" id="soundBtn">Sound: ON</button>
+              <button class="btn secondary" id="clearLocksBtn" style="display:none;">Reset demo locks (dev)</button>
             </div>
 
             <div class="small" id="limitMsg" style="display:none;"></div>
@@ -277,6 +301,17 @@
 <script>
 (() => {
   // ===============================
+  // DEV MODE
+  // ===============================
+  const DEV_MODE = new URLSearchParams(location.search).get("dev") === "1";
+  const devBadge = document.getElementById("devBadge");
+  const clearLocksBtn = document.getElementById("clearLocksBtn");
+  if (DEV_MODE){
+    devBadge.style.display = "inline-flex";
+    clearLocksBtn.style.display = "block";
+  }
+
+  // ===============================
   // CONFIG
   // ===============================
   const BG_PATH = "./assets/images/sakura-bg.png";
@@ -292,7 +327,7 @@
     { t: 10, spawnPerSec: 7.4, goldChance: 0.22, size: 34, fallMin: 150, fallMax: 300,  drag: 0.982, tapCooldownMs: 80 },
   ];
 
-  // Wind (global) parameters
+  // Wind params
   const WIND_BASE = 22;      // px/s baseline drift
   const WIND_GUST = 130;     // px/s gust intensity
   const WIND_FREQ = 0.55;    // gust frequency
@@ -377,7 +412,22 @@
   }
   function setUnclaimedPrize(obj){ localStorage.setItem(prizeKey(), JSON.stringify(obj)); }
 
+  function clearLocks(){
+    localStorage.removeItem(prizeKey());
+    localStorage.removeItem(playsKey());
+  }
+
   function updateLocksUI(){
+    // ✅ DEV MODE bypass (no restrictions)
+    if (DEV_MODE){
+      limitMsg.style.display = "none";
+      prizeBlockMsg.style.display = "none";
+      startBtn.disabled = false;
+      startBtn.style.opacity = "1";
+      startBtn.style.cursor = "pointer";
+      return;
+    }
+
     const plays = getPlaysToday();
     const unclaimed = getUnclaimedPrize();
 
@@ -470,17 +520,12 @@
   }
   function showHow(){
     alert(
-`How it works:
-• Tap ONLY gold petals (pink petals don’t count).
-• 15 seconds.
-• Prizes:
-   - 18–24: Free miso soup
-   - 25–29: 50% next purchase
-   - 30+: Free katsu curry
-• Windy physics: petals drift + flutter + gusts.
-• Demo:
-   - 1 play/day per device
-   - 1 prize at a time (redeem before playing again)`
+`Tap ONLY gold petals (pink petals don’t count).
+15 seconds.
+Prizes:
+• 18–24: Free miso soup
+• 25–29: 50% next purchase
+• 30+: Free katsu curry`
     );
   }
 
@@ -494,16 +539,14 @@
   }
 
   // ===============================
-  // SVG Petal Generator (realistic shape)
+  // SVG Petal (realistic-ish)
   // ===============================
   function petalSVG(isGold){
-    // Pink vs Gold palette
     const c1 = isGold ? "#fff3d6" : "#fff";
     const c2 = isGold ? "#e9c779" : "#ffb4d1";
     const c3 = isGold ? "#d4a956" : "#ff8ab8";
     const vein = isGold ? "rgba(255,255,255,.45)" : "rgba(255,255,255,.55)";
 
-    // Organic sakura-like teardrop
     return `
       <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <defs>
@@ -518,7 +561,6 @@
           </linearGradient>
         </defs>
 
-        <!-- main petal -->
         <path d="M50 6
                  C72 18, 92 42, 88 67
                  C84 92, 62 112, 50 114
@@ -526,7 +568,6 @@
                  C8 42, 28 18, 50 6 Z"
               fill="url(#g)"/>
 
-        <!-- highlight -->
         <path d="M36 28
                  C54 20, 74 42, 70 66
                  C66 88, 50 96, 40 92
@@ -534,7 +575,6 @@
                  C26 40, 30 32, 36 28 Z"
               fill="url(#s)" opacity=".75"/>
 
-        <!-- veins -->
         <path d="M50 18 C46 40, 46 66, 50 108" stroke="${vein}" stroke-width="2" opacity=".35" fill="none"/>
         <path d="M50 42 C40 54, 32 64, 26 72" stroke="${vein}" stroke-width="1.6" opacity=".25" fill="none"/>
         <path d="M50 42 C60 54, 68 64, 74 72" stroke="${vein}" stroke-width="1.6" opacity=".25" fill="none"/>
@@ -543,12 +583,11 @@
   }
 
   // ===============================
-  // Wind function (gusty)
+  // Wind
   // ===============================
   function windAtTime(t){
-    // t in seconds (global)
-    const gust = Math.sin(t * WIND_FREQ) * 0.7 + Math.sin(t * (WIND_FREQ * 2.3 + 0.1)) * 0.3;
-    return WIND_BASE + gust * WIND_GUST;
+    const gust = Math.sin(t * 0.55) * 0.7 + Math.sin(t * (0.55 * 2.3 + 0.1)) * 0.3;
+    return 22 + gust * 130;
   }
 
   // ===============================
@@ -560,26 +599,20 @@
 
     const isGold = Math.random() < cfg.goldChance;
 
-    // size (petal image-like)
     const size = Math.max(26, Math.round(cfg.size + (Math.random()*4 - 2)));
-
     const x = 20 + Math.random() * (rect.width - 40);
     const y = -40 - Math.random()*60;
 
-    // velocities
     const vy = cfg.fallMin + Math.random() * (cfg.fallMax - cfg.fallMin);
     const vx = (Math.random()*2 - 1) * 25;
 
-    // flutter
     const rot = Math.random()*360;
     const rotSpeed = (Math.random()*240 - 120);
 
-    // per-petal sway
     const swayAmp = 10 + Math.random()*22;
     const swayFreq = 1.2 + Math.random()*1.8;
     const phase = Math.random() * Math.PI * 2;
 
-    // small lift wobble
     const liftAmp = 6 + Math.random()*10;
     const liftFreq = 1.8 + Math.random()*2.1;
 
@@ -591,14 +624,12 @@
     stage.appendChild(el);
 
     const p = {
-      el,
-      isGold,
+      el, isGold,
       x, y,
       vx, vy,
       rot, rotSpeed,
       swayAmp, swayFreq, phase,
       liftAmp, liftFreq,
-      bornT: elapsed,
       scale: 0.90 + Math.random()*0.22,
       opacity: 0.85 + Math.random()*0.15
     };
@@ -658,7 +689,6 @@
     const tLeft = Math.max(0, GAME_SECONDS - elapsed);
     timeEl.textContent = tLeft.toFixed(1);
 
-    // spawn
     spawnAcc += dt * cfg.spawnPerSec;
     while(spawnAcc >= 1){
       spawnPetal(elapsed);
@@ -669,38 +699,28 @@
     const w = windAtTime(elapsed);
 
     for(const p of [...petals]){
-      // global wind + turbulence
-      const turb = Math.sin((elapsed * 3.7) + p.phase) * TURB * 20;
-
-      // sway (like falling from trees)
+      const turb = Math.sin((elapsed * 3.7) + p.phase) * 0.9 * 20;
       const sway = Math.sin((elapsed * p.swayFreq) + p.phase) * p.swayAmp;
-
-      // flutter lift (tiny up/down wobble)
       const lift = Math.sin((elapsed * p.liftFreq) + p.phase) * p.liftAmp;
 
-      // integrate velocities
-      p.vx += (w * 0.35 + turb) * dt;     // accelerate sideways
-      p.vx *= cfg.drag;                  // drag
-      p.vy += 12 * dt;                   // gravity-ish
-      p.vy *= (cfg.drag + 0.002);        // slight vertical drag
+      p.vx += (w * 0.35 + turb) * dt;
+      p.vx *= cfg.drag;
 
-      // position
+      p.vy += 12 * dt;
+      p.vy *= (cfg.drag + 0.002);
+
       p.x += (p.vx * dt) + sway * dt * 35;
       p.y += (p.vy * dt) - lift * dt * 18;
 
-      // rotation flutter
       p.rot += (p.rotSpeed + (p.vx * 0.35)) * dt;
 
-      // bounds: bounce softly on sides
       if(p.x < 10){ p.x = 10; p.vx *= -0.55; }
       if(p.x > rect.width - 10){ p.x = rect.width - 10; p.vx *= -0.55; }
 
-      // render
       p.el.style.left = p.x + "px";
       p.el.style.top = p.y + "px";
       p.el.style.transform = `translate(-50%,-50%) rotate(${p.rot}deg) scale(${p.scale})`;
 
-      // remove when off screen
       if(p.y > rect.height + 120) removePetal(p);
     }
 
@@ -717,14 +737,16 @@
   // ===============================
   function startGame(){
     updateLocksUI();
-    const plays = getPlaysToday();
-    const unclaimed = getUnclaimedPrize();
-    if(unclaimed) return;
-    if(plays >= DAILY_PLAY_LIMIT) return;
+
+    if (!DEV_MODE){
+      const plays = getPlaysToday();
+      const unclaimed = getUnclaimedPrize();
+      if(unclaimed) return;
+      if(plays >= DAILY_PLAY_LIMIT) return;
+      incPlaysToday();
+    }
 
     ensureAudio();
-    incPlaysToday();
-
     resetHud();
     clearAllPetals();
     setToast("");
@@ -748,7 +770,6 @@
     clearAllPetals();
 
     const prize = prizeForScore(score);
-
     overlay.style.display = "grid";
 
     if(!prize){
@@ -759,7 +780,7 @@
           <div style="font-weight:950;font-size:16px;margin-top:6px;">No prize today</div>
           <div class="small">Try again tomorrow 🌸</div>
           <button class="btn" id="okBtn">OK</button>
-          <div class="small">Limit: ${DAILY_PLAY_LIMIT} play/day per device (demo mode).</div>
+          <div class="small">${DEV_MODE ? "DEV MODE: play unlimited ✅" : `Limit: ${DAILY_PLAY_LIMIT} play/day per device (demo mode).`}</div>
         </div>
       `;
       document.getElementById("okBtn").onclick = () => location.reload();
@@ -767,7 +788,9 @@
     }
 
     const voucher = makeVoucher(score);
-    setUnclaimedPrize(voucher);
+
+    // ✅ In DEV_MODE I don't store unclaimed prize (so it never blocks testing)
+    if (!DEV_MODE) setUnclaimedPrize(voucher);
 
     overlay.innerHTML = `
       <div class="stack">
@@ -780,7 +803,9 @@
           </div>
           <div class="small" style="margin-top:6px;">Show this code at the counter.</div>
           <div class="code">${voucher.code}</div>
-          <div class="small" style="margin-top:6px;">One prize at a time: redeem before playing again.</div>
+          <div class="small" style="margin-top:6px;">
+            ${DEV_MODE ? "DEV MODE: voucher not saved (won’t block)." : "One prize at a time: redeem before playing again."}
+          </div>
         </div>
 
         <button class="btn" id="redeemBtn">Open Staff Redeem</button>
@@ -808,23 +833,30 @@
   }
 
   // ===============================
-  // Events
+  // SOUND
+  // ===============================
+  let audioCtx = null;
+  function ensureAudio(){
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
+  }
+
+  // ===============================
+  // EVENTS
   // ===============================
   startBtn.addEventListener("click", startGame);
-  howBtn.addEventListener("click", () => alert(
-`Tap ONLY gold petals.
-Pink petals don’t count.
-15 seconds.
-Prize tiers:
-• 18–24: Free miso soup
-• 25–29: 50% next purchase
-• 30+: Free katsu curry`
-  ));
+  howBtn.addEventListener("click", showHow);
 
   soundBtn.addEventListener("click", () => {
     soundOn = !soundOn;
     soundBtn.textContent = `Sound: ${soundOn ? "ON" : "OFF"}`;
     if(soundOn) ensureAudio();
+  });
+
+  clearLocksBtn.addEventListener("click", () => {
+    clearLocks();
+    alert("Reset done ✅");
+    location.reload();
   });
 
   // init
