@@ -13,8 +13,9 @@
       --stroke: rgba(255,255,255,.16);
 
       --gold:#d4a956;
-      --ok:#6ee7b7;
-      --bad:#fb7185;
+      --green:#22c55e; /* miso */
+      --blue:#3b82f6;  /* 50% */
+      --red:#fb7185;   /* katsu */
     }
 
     *{ box-sizing:border-box; }
@@ -25,12 +26,12 @@
     }
     body{ overflow:hidden; touch-action:manipulation; }
 
-    /* Background (robust) */
+    /* ✅ Correct path: assets/images/sakura-bg.png */
     .bg{
       position:fixed; inset:0;
       background:
         linear-gradient(rgba(0,0,0,.18), rgba(0,0,0,.42)),
-        url("./assets/img/sakura-bg.png");
+        url("./assets/images/sakura-bg.png");
       background-size:cover;
       background-position:center;
       transform:scale(1.02);
@@ -42,13 +43,12 @@
       pointer-events:none;
     }
 
-    /* HUD */
     .hud{
       position:fixed; left:12px; right:12px; top:12px;
       display:flex; gap:10px; align-items:stretch; justify-content:space-between;
       pointer-events:none;
     }
-    .hud .card{
+    .card{
       pointer-events:auto;
       background:var(--panel);
       border:1px solid var(--stroke);
@@ -57,9 +57,9 @@
       padding:10px 12px;
       min-width: 160px;
     }
-    .hud .title{ font-size:12px; color:var(--muted); margin-bottom:2px; }
-    .hud .value{ font-size:18px; font-weight:800; letter-spacing:.2px; }
-    .hud .right{ text-align:right; }
+    .title{ font-size:12px; color:var(--muted); margin-bottom:2px; }
+    .value{ font-size:18px; font-weight:850; letter-spacing:.2px; }
+    .right{ text-align:right; }
 
     .pill{
       display:inline-flex; align-items:center; gap:8px;
@@ -85,75 +85,9 @@
       flex:0 0 auto;
     }
 
-    /* Overlay modal */
-    .centerPanel{
-      position:fixed; inset:0;
-      display:flex; align-items:center; justify-content:center;
-      padding:20px;
-      pointer-events:none;
-    }
-    .modal{
-      pointer-events:auto;
-      width:min(520px, 92vw);
-      background:rgba(0,0,0,.45);
-      border:1px solid var(--stroke);
-      backdrop-filter: blur(10px);
-      border-radius:22px;
-      padding:18px;
-      box-shadow: 0 22px 70px rgba(0,0,0,.55);
-    }
-    h1{ margin:0 0 8px 0; font-size:22px; }
-    p{ margin:0 0 10px 0; color:var(--muted); line-height:1.45; font-size:13px; }
-
-    .rules{
-      display:grid; gap:8px; margin:12px 0 12px 0;
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:16px;
-      padding:12px;
-      background:rgba(255,255,255,.04);
-    }
-    .ruleRow{ display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:13px; }
-    .ruleRow b{ color:var(--text); font-weight:650; }
-
-    .legend{
-      display:grid; gap:8px; margin-top:10px;
-    }
-    .legRow{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      font-size:13px; color:var(--muted);
-      padding:10px 12px; border-radius:14px;
-      border:1px solid rgba(255,255,255,.10); background:rgba(0,0,0,.22);
-    }
-    .legLeft{ display:flex; align-items:center; gap:10px; }
-    .legDot{ width:12px; height:12px; border-radius:999px; border:1px solid rgba(255,255,255,.22); }
-    .legDot.none{ background:#d4a956; }
-    .legDot.miso{ background:#22c55e; }
-    .legDot.half{ background:#3b82f6; }
-    .legDot.katsu{ background:#fb7185; }
-
-    .btnRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-    button{
-      appearance:none;
-      border:1px solid rgba(212,169,86,.45);
-      background:rgba(0,0,0,.35);
-      color:var(--text);
-      padding:11px 14px;
-      border-radius:14px;
-      cursor:pointer;
-      font-weight:700;
-      letter-spacing:.2px;
-    }
-    button:hover{ background:rgba(212,169,86,.10); }
-    .ghost{ border-color:rgba(255,255,255,.18); }
-    .ghost:hover{ background:rgba(255,255,255,.06); }
-
-    .note{ margin-top:10px; font-size:12px; color:rgba(247,243,234,.55); }
-    .hidden{ display:none !important; }
-
-    /* Field */
     .field{ position:fixed; inset:0; overflow:hidden; }
 
-    /* Petal base (decoys are pink) */
+    /* ===== Petal base (decoys): pink fill ===== */
     .petal{
       position:absolute;
       width:64px; height:64px;
@@ -162,11 +96,11 @@
       user-select:none;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
+
       border:1px solid rgba(255,255,255,.20);
       box-shadow: 0 10px 26px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.35);
       transition: transform 120ms ease, filter 120ms ease;
 
-      /* PINK fill */
       background:
         radial-gradient(circle at 35% 30%, rgba(255,255,255,.95), rgba(255,255,255,0) 55%),
         radial-gradient(circle at 30% 25%, rgba(255,183,210,.95), rgba(255,255,255,.12) 64%),
@@ -182,7 +116,7 @@
       pointer-events:none;
     }
 
-    /* Highlighted: pulse + thicker border */
+    /* ===== Highlighted petal (target): pulse ===== */
     .target{
       animation: pulse 760ms ease-in-out infinite;
       border-width:2px;
@@ -192,9 +126,9 @@
       50%{ transform: scale(1.08) rotate(18deg); }
     }
 
-    /* ====== IMPORTANT: highlighted FILLS (not only border) ====== */
+    /* ✅ Guaranteed FILL COLORS for target */
     .target-none{
-      border-color: rgba(212,169,86,.92);
+      border-color: rgba(212,169,86,.95);
       filter: drop-shadow(0 0 12px rgba(212,169,86,.55)) drop-shadow(0 0 22px rgba(255,255,255,.10));
       background:
         radial-gradient(circle at 35% 30%, rgba(255,255,255,.95), rgba(255,255,255,0) 55%),
@@ -226,7 +160,6 @@
         linear-gradient(140deg, rgba(255,255,255,.18), rgba(251,113,133,.55));
     }
 
-    /* ignored tap feedback */
     .wrongFlash{ animation: wrong 220ms ease-in-out 1; }
     @keyframes wrong{
       0%{ filter:none; }
@@ -250,32 +183,63 @@
       100%{ opacity:0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.2); }
     }
 
+    .centerPanel{
+      position:fixed; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      padding:20px;
+      pointer-events:none;
+    }
+    .modal{
+      pointer-events:auto;
+      width:min(520px, 92vw);
+      background:rgba(0,0,0,.45);
+      border:1px solid var(--stroke);
+      backdrop-filter: blur(10px);
+      border-radius:22px;
+      padding:18px;
+      box-shadow: 0 22px 70px rgba(0,0,0,.55);
+    }
+    .rules{
+      display:grid; gap:8px; margin:12px 0 14px 0;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:16px;
+      padding:12px;
+      background:rgba(255,255,255,.04);
+    }
+    .ruleRow{ display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:13px; }
+    .ruleRow b{ color:var(--text); font-weight:650; }
+
+    .btnRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    button{
+      appearance:none;
+      border:1px solid rgba(212,169,86,.45);
+      background:rgba(0,0,0,.35);
+      color:var(--text);
+      padding:11px 14px;
+      border-radius:14px;
+      cursor:pointer;
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+    button:hover{ background:rgba(212,169,86,.10); }
+    .ghost{ border-color:rgba(255,255,255,.18); }
+    .ghost:hover{ background:rgba(255,255,255,.06); }
+
+    .note{ margin-top:10px; font-size:12px; color:rgba(247,243,234,.55); }
+    .hidden{ display:none !important; }
+
     .prizeBig{
       font-size:18px;
       font-weight:900;
-      color: var(--ok);
+      color: #6ee7b7;
       margin-top:8px;
     }
-    .prizeBig.bad{ color: var(--bad); }
-
-    .warn{
-      margin-top:10px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(251,113,133,.35);
-      background: rgba(251,113,133,.10);
-      color: rgba(247,243,234,.85);
-      font-size:12px;
-    }
-    .warn code{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size:12px;
-    }
+    .prizeBig.bad{ color:#fb7185; }
   </style>
 </head>
 
 <body>
-  <div class="bg" id="bg"></div>
+  <div class="bg"></div>
   <div class="vignette"></div>
 
   <div class="field" id="field"></div>
@@ -286,7 +250,7 @@
       <div class="value" id="score">0</div>
     </div>
 
-    <div class="pill" id="prizePill">
+    <div class="pill">
       <span class="dot" id="prizeDot"></span>
       Prize now: <b id="prizeText">No prize yet</b>
     </div>
@@ -299,8 +263,11 @@
 
   <div class="centerPanel" id="overlay">
     <div class="modal" id="modal">
-      <h1>Sakura Tap (15s)</h1>
-      <p><b style="color:var(--gold)">Tap only on the highlighted petals.</b> The highlighted petal changes FILL color when you reach prize ranges.</p>
+      <h1 style="margin:0 0 8px 0;font-size:22px;">Sakura Tap (15s)</h1>
+      <p style="margin:0 0 10px 0;color:var(--muted);font-size:13px;line-height:1.45;">
+        <b style="color:var(--gold)">Tap only on the highlighted petals.</b>
+        The highlighted petal changes FILL color when you reach prize ranges.
+      </p>
 
       <div class="rules">
         <div class="ruleRow"><span>18–24</span> <b>Free miso soup</b></div>
@@ -308,23 +275,12 @@
         <div class="ruleRow"><span>30+</span> <b>Free katsu curry</b></div>
       </div>
 
-      <div class="legend">
-        <div class="legRow"><div class="legLeft"><span class="legDot none"></span><span>0–17</span></div><b>Gold</b></div>
-        <div class="legRow"><div class="legLeft"><span class="legDot miso"></span><span>18–24</span></div><b>Green</b></div>
-        <div class="legRow"><div class="legLeft"><span class="legDot half"></span><span>25–29</span></div><b>Blue</b></div>
-        <div class="legRow"><div class="legLeft"><span class="legDot katsu"></span><span>30+</span></div><b>Red</b></div>
-      </div>
-
-      <div id="bgWarn" class="warn hidden"></div>
-
       <div class="btnRow">
         <button id="startBtn">Start</button>
         <button class="ghost" id="muteBtn">Sound: ON</button>
       </div>
 
-      <div class="note">
-        Difficulty: smaller target + more decoys + faster switching + movement (hard 25, brutal 30).
-      </div>
+      <div class="note">Designed so 25 is hard, and 30 is really hard.</div>
     </div>
   </div>
 
@@ -356,8 +312,6 @@
     const prizeText = document.getElementById("prizeText");
     const prizeDot = document.getElementById("prizeDot");
 
-    const bgWarn = document.getElementById("bgWarn");
-
     let running = false;
     let soundOn = true;
 
@@ -371,24 +325,7 @@
     let switchTimer = null;
     let lastTapAt = 0;
 
-    // Check background image exists (GH Pages path issues)
-    (function checkBg(){
-      const test = new Image();
-      test.onload = () => { /* ok */ };
-      test.onerror = () => {
-        bgWarn.classList.remove("hidden");
-        bgWarn.innerHTML =
-          `Background image not found.<br>
-           Put your file here: <code>assets/img/sakura-bg.png</code><br>
-           (GitHub Pages is case-sensitive.)`;
-        // fallback look if missing
-        document.getElementById("bg").style.background =
-          "linear-gradient(rgba(0,0,0,.22), rgba(0,0,0,.58)), radial-gradient(circle at 30% 20%, rgba(255,182,210,.22), rgba(0,0,0,.85) 70%)";
-      };
-      test.src = "./assets/img/sakura-bg.png";
-    })();
-
-    // SOUND (simple beep)
+    // SOUND
     let audioCtx = null;
     function ensureAudio(){
       if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -401,11 +338,14 @@
       const o = audioCtx.createOscillator();
       const g = audioCtx.createGain();
       const freq = ok ? 880 : 220;
+
       o.type = "triangle";
       o.frequency.setValueAtTime(freq, t);
       o.frequency.exponentialRampToValueAtTime(freq * (ok ? 1.6 : 1.2), t + 0.05);
+
       g.gain.setValueAtTime(ok ? 0.07 : 0.10, t);
       g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+
       o.connect(g); g.connect(audioCtx.destination);
       o.start(t); o.stop(t + 0.08);
     }
@@ -414,15 +354,15 @@
     function rand(min,max){ return Math.random()*(max-min)+min; }
     function viewport(){ return { w: window.innerWidth, h: window.innerHeight }; }
 
-    function currentPrizeBracket(s){
-      if(s >= 30) return { key:"katsu", label:"Free katsu curry", dot:"#fb7185", cls:"target-katsu" };
-      if(s >= 25) return { key:"half",  label:"50% next purchase", dot:"#3b82f6", cls:"target-half" };
-      if(s >= 18) return { key:"miso",  label:"Free miso soup", dot:"#22c55e", cls:"target-miso" };
-      return { key:"none", label:"No prize yet", dot:"#d4a956", cls:"target-none" };
+    function currentPrize(s){
+      if(s >= 30) return { label:"Free katsu curry", dot:"#fb7185", cls:"target-katsu" };
+      if(s >= 25) return { label:"50% next purchase", dot:"#3b82f6", cls:"target-half" };
+      if(s >= 18) return { label:"Free miso soup", dot:"#22c55e", cls:"target-miso" };
+      return { label:"No prize yet", dot:"#d4a956", cls:"target-none" };
     }
 
     function updatePrizeUI(){
-      const p = currentPrizeBracket(score);
+      const p = currentPrize(score);
       prizeText.textContent = p.label;
       prizeDot.style.background = p.dot;
     }
@@ -477,35 +417,32 @@
 
       const rot = rand(-40, 40);
       el.style.transform = `rotate(${rot}deg)`;
-      el._rot = rot;
-    }
-
-    function applyTarget(idx, phase){
-      const cfg = PHASE_SETTINGS[phase];
-      const p = currentPrizeBracket(score);
-
-      petals.forEach((el, i) => {
-        const isT = (i === idx);
-
-        el.classList.toggle("target", isT);
-        el.classList.remove("target-none","target-miso","target-half","target-katsu");
-
-        if(isT) el.classList.add(p.cls);
-
-        const size = isT ? cfg.targetSize : cfg.decoySize;
-        el.style.width = size + "px";
-        el.style.height = size + "px";
-      });
     }
 
     function refreshTargetColor(){
       if(targetIndex < 0 || targetIndex >= petals.length) return;
       const el = petals[targetIndex];
       if(!el) return;
-
-      const p = currentPrizeBracket(score);
+      const p = currentPrize(score);
       el.classList.remove("target-none","target-miso","target-half","target-katsu");
       el.classList.add(p.cls);
+    }
+
+    function applyTarget(idx, phase){
+      const cfg = PHASE_SETTINGS[phase];
+      const p = currentPrize(score);
+
+      petals.forEach((el, i) => {
+        const isT = (i === idx);
+
+        el.classList.toggle("target", isT);
+        el.classList.remove("target-none","target-miso","target-half","target-katsu");
+        if(isT) el.classList.add(p.cls);
+
+        const size = isT ? cfg.targetSize : cfg.decoySize;
+        el.style.width = size + "px";
+        el.style.height = size + "px";
+      });
     }
 
     function scheduleTargetSwitch(){
@@ -521,6 +458,7 @@
 
         let next = Math.floor(Math.random() * petals.length);
         if(next === targetIndex && petals.length > 1) next = (next + 1) % petals.length;
+
         targetIndex = next;
         applyTarget(targetIndex, phase);
 
@@ -562,9 +500,7 @@
       targetIndex = Math.floor(Math.random() * petals.length);
       applyTarget(targetIndex, phase);
 
-      petals.forEach((el, idx) => {
-        el.onclick = (e) => handleTap(e, idx);
-      });
+      petals.forEach((el, idx) => el.onclick = (e) => handleTap(e, idx));
 
       scheduleTargetSwitch();
     }
@@ -600,7 +536,7 @@
       }
     }
 
-    // RULE: only highlighted counts
+    // ONLY highlighted counts
     function handleTap(ev, idx){
       if(!running) return;
 
@@ -629,23 +565,12 @@
       spawnSpark(x, y, true);
       setScore(score + 1);
 
-      // harder: instant swap after correct tap in MED/HARD
+      // instant swap after correct tap in MED/HARD
       if(phase !== "EASY"){
         let next = Math.floor(Math.random() * petals.length);
         if(next === targetIndex && petals.length > 1) next = (next + 1) % petals.length;
         targetIndex = next;
         applyTarget(targetIndex, phase);
-
-        if(phase === "HARD"){
-          const cfg = PHASE_SETTINGS[phase];
-          for(let k=0;k<3;k++){
-            const j = Math.floor(Math.random() * petals.length);
-            const isT = (j === targetIndex);
-            placePetal(petals[j], isT ? cfg.targetSize : cfg.decoySize);
-          }
-        }
-      } else {
-        refreshTargetColor();
       }
     }
 
@@ -703,8 +628,8 @@
 
       overlay.classList.remove("hidden");
       modal.innerHTML = `
-        <h1>Time’s up!</h1>
-        <p class="muted">Final score: <b style="color:var(--gold)">${score}</b></p>
+        <h1 style="margin:0 0 8px 0;font-size:22px;">Time’s up!</h1>
+        <p style="margin:0 0 10px 0;color:var(--muted);font-size:13px;">Final score: <b style="color:var(--gold)">${score}</b></p>
 
         <div class="rules" style="margin-top:12px">
           <div class="ruleRow"><span>18–24</span> <b>Free miso soup</b></div>
@@ -713,7 +638,7 @@
         </div>
 
         <div class="prizeBig ${prize.ok ? "" : "bad"}">${prize.ok ? prize.name : "No prize"}</div>
-        <p style="margin-top:8px">${prize.msg}</p>
+        <p style="margin-top:8px;color:var(--muted);font-size:13px;line-height:1.45;">${prize.msg}</p>
 
         <div class="btnRow" style="margin-top:12px">
           <button id="restartBtn">Play again</button>
@@ -734,18 +659,6 @@
     startBtn.addEventListener("click", startGame);
     muteBtn.addEventListener("click", () => toggleSound(muteBtn));
 
-    window.addEventListener("resize", () => {
-      if(!running) return;
-      const elapsed = (performance.now() - startTs) / 1000;
-      const phase = getPhase(elapsed);
-      const cfg = PHASE_SETTINGS[phase];
-      petals.forEach((el, i) => {
-        const size = (i === targetIndex) ? cfg.targetSize : cfg.decoySize;
-        placePetal(el, size);
-      });
-    });
-
-    // init HUD
     updatePrizeUI();
   </script>
 </body>
