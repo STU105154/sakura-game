@@ -12,10 +12,10 @@
       --panel: rgba(0,0,0,.35);
       --stroke: rgba(255,255,255,.16);
 
-      --gold:#d4a956;
-      --green:#22c55e; /* miso */
-      --blue:#3b82f6;  /* 50% */
-      --red:#fb7185;   /* katsu */
+      --gold:#d4a956;   /* 0–17 */
+      --green:#22c55e;  /* 18–24 */
+      --blue:#3b82f6;   /* 25–29 */
+      --red:#fb7185;    /* 30+ */
     }
 
     *{ box-sizing:border-box; }
@@ -26,7 +26,7 @@
     }
     body{ overflow:hidden; touch-action:manipulation; }
 
-    /* ✅ Correct path: assets/images/sakura-bg.png */
+    /* ✅ THIS must match your repo */
     .bg{
       position:fixed; inset:0;
       background:
@@ -87,7 +87,7 @@
 
     .field{ position:fixed; inset:0; overflow:hidden; }
 
-    /* ===== Petal base (decoys): pink fill ===== */
+    /* DECoys: make them clearly pink (visible) */
     .petal{
       position:absolute;
       width:64px; height:64px;
@@ -97,14 +97,15 @@
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
 
-      border:1px solid rgba(255,255,255,.20);
+      border:1px solid rgba(255,255,255,.22);
       box-shadow: 0 10px 26px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.35);
       transition: transform 120ms ease, filter 120ms ease;
 
+      /* Stronger pink */
       background:
         radial-gradient(circle at 35% 30%, rgba(255,255,255,.95), rgba(255,255,255,0) 55%),
-        radial-gradient(circle at 30% 25%, rgba(255,183,210,.95), rgba(255,255,255,.12) 64%),
-        linear-gradient(140deg, rgba(255,210,230,.85), rgba(255,150,190,.55));
+        radial-gradient(circle at 30% 25%, rgba(255,120,185,.95), rgba(255,255,255,.10) 64%),
+        linear-gradient(140deg, rgba(255,200,230,.95), rgba(255,95,170,.65));
     }
     .petal::after{
       content:"";
@@ -116,7 +117,7 @@
       pointer-events:none;
     }
 
-    /* ===== Highlighted petal (target): pulse ===== */
+    /* Highlighted: pulse + thicker border */
     .target{
       animation: pulse 760ms ease-in-out infinite;
       border-width:2px;
@@ -126,38 +127,38 @@
       50%{ transform: scale(1.08) rotate(18deg); }
     }
 
-    /* ✅ Guaranteed FILL COLORS for target */
+    /* ✅ FILL colors for highlighted petal */
     .target-none{
       border-color: rgba(212,169,86,.95);
-      filter: drop-shadow(0 0 12px rgba(212,169,86,.55)) drop-shadow(0 0 22px rgba(255,255,255,.10));
+      filter: drop-shadow(0 0 12px rgba(212,169,86,.60));
       background:
         radial-gradient(circle at 35% 30%, rgba(255,255,255,.95), rgba(255,255,255,0) 55%),
-        radial-gradient(circle at 30% 25%, rgba(212,169,86,.95), rgba(255,255,255,.10) 64%),
-        linear-gradient(140deg, rgba(255,255,255,.18), rgba(212,169,86,.55));
+        radial-gradient(circle at 30% 25%, rgba(212,169,86,.98), rgba(255,255,255,.10) 64%),
+        linear-gradient(140deg, rgba(255,255,255,.16), rgba(212,169,86,.65));
     }
     .target-miso{
-      border-color: rgba(34,197,94,.95);
-      filter: drop-shadow(0 0 12px rgba(34,197,94,.55)) drop-shadow(0 0 22px rgba(255,255,255,.10));
+      border-color: rgba(34,197,94,.98);
+      filter: drop-shadow(0 0 12px rgba(34,197,94,.60));
       background:
         radial-gradient(circle at 35% 30%, rgba(255,255,255,.95), rgba(255,255,255,0) 55%),
-        radial-gradient(circle at 30% 25%, rgba(34,197,94,.95), rgba(255,255,255,.10) 64%),
-        linear-gradient(140deg, rgba(255,255,255,.18), rgba(34,197,94,.55));
+        radial-gradient(circle at 30% 25%, rgba(34,197,94,.98), rgba(255,255,255,.10) 64%),
+        linear-gradient(140deg, rgba(255,255,255,.16), rgba(34,197,94,.65));
     }
     .target-half{
-      border-color: rgba(59,130,246,.95);
-      filter: drop-shadow(0 0 12px rgba(59,130,246,.55)) drop-shadow(0 0 22px rgba(255,255,255,.10));
+      border-color: rgba(59,130,246,.98);
+      filter: drop-shadow(0 0 12px rgba(59,130,246,.60));
       background:
         radial-gradient(circle at 35% 30%, rgba(255,255,255,.95), rgba(255,255,255,0) 55%),
-        radial-gradient(circle at 30% 25%, rgba(59,130,246,.95), rgba(255,255,255,.10) 64%),
-        linear-gradient(140deg, rgba(255,255,255,.18), rgba(59,130,246,.55));
+        radial-gradient(circle at 30% 25%, rgba(59,130,246,.98), rgba(255,255,255,.10) 64%),
+        linear-gradient(140deg, rgba(255,255,255,.16), rgba(59,130,246,.65));
     }
     .target-katsu{
-      border-color: rgba(251,113,133,.95);
-      filter: drop-shadow(0 0 12px rgba(251,113,133,.55)) drop-shadow(0 0 22px rgba(255,255,255,.10));
+      border-color: rgba(251,113,133,.98);
+      filter: drop-shadow(0 0 12px rgba(251,113,133,.60));
       background:
         radial-gradient(circle at 35% 30%, rgba(255,255,255,.95), rgba(255,255,255,0) 55%),
-        radial-gradient(circle at 30% 25%, rgba(251,113,133,.95), rgba(255,255,255,.10) 64%),
-        linear-gradient(140deg, rgba(255,255,255,.18), rgba(251,113,133,.55));
+        radial-gradient(circle at 30% 25%, rgba(251,113,133,.98), rgba(255,255,255,.10) 64%),
+        linear-gradient(140deg, rgba(255,255,255,.16), rgba(251,113,133,.65));
     }
 
     .wrongFlash{ animation: wrong 220ms ease-in-out 1; }
@@ -228,10 +229,24 @@
     .note{ margin-top:10px; font-size:12px; color:rgba(247,243,234,.55); }
     .hidden{ display:none !important; }
 
+    .warn{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(251,113,133,.35);
+      background: rgba(251,113,133,.10);
+      color: rgba(247,243,234,.85);
+      font-size:12px;
+    }
+    .warn code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px;
+    }
+
     .prizeBig{
       font-size:18px;
       font-weight:900;
-      color: #6ee7b7;
+      color:#6ee7b7;
       margin-top:8px;
     }
     .prizeBig.bad{ color:#fb7185; }
@@ -239,9 +254,8 @@
 </head>
 
 <body>
-  <div class="bg"></div>
+  <div class="bg" id="bg"></div>
   <div class="vignette"></div>
-
   <div class="field" id="field"></div>
 
   <div class="hud">
@@ -275,17 +289,37 @@
         <div class="ruleRow"><span>30+</span> <b>Free katsu curry</b></div>
       </div>
 
+      <div id="bgWarn" class="warn hidden"></div>
+
       <div class="btnRow">
         <button id="startBtn">Start</button>
         <button class="ghost" id="muteBtn">Sound: ON</button>
       </div>
 
-      <div class="note">Designed so 25 is hard, and 30 is really hard.</div>
+      <div class="note">Difficulty: hard to reach 25, brutal to reach 30.</div>
     </div>
   </div>
 
   <script>
+    const BG_PATH = "./assets/images/sakura-bg.png"; // ✅ one source of truth
     const GAME_SECONDS = 15.0;
+
+    // Background check (now correct)
+    (function checkBg(){
+      const test = new Image();
+      const bgWarn = document.getElementById("bgWarn");
+      test.onload = () => {};
+      test.onerror = () => {
+        bgWarn.classList.remove("hidden");
+        bgWarn.innerHTML =
+          `Background image not found.<br>
+           Put your file here: <code>assets/images/sakura-bg.png</code><br>
+           (GitHub Pages is case-sensitive.)`;
+        document.getElementById("bg").style.background =
+          "linear-gradient(rgba(0,0,0,.22), rgba(0,0,0,.58)), radial-gradient(circle at 30% 20%, rgba(255,182,210,.22), rgba(0,0,0,.85) 70%)";
+      };
+      test.src = BG_PATH;
+    })();
 
     function getPhase(elapsed){
       if(elapsed < 5) return "EASY";
@@ -316,7 +350,6 @@
     let soundOn = true;
 
     let score = 0;
-    let remaining = GAME_SECONDS;
     let startTs = 0;
     let rafId = null;
 
@@ -325,7 +358,7 @@
     let switchTimer = null;
     let lastTapAt = 0;
 
-    // SOUND
+    // Sound
     let audioCtx = null;
     function ensureAudio(){
       if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -373,6 +406,7 @@
       updatePrizeUI();
       refreshTargetColor();
     }
+
     function setTime(sec){ timeEl.textContent = sec.toFixed(1); }
 
     function spawnSpark(x, y, ok){
@@ -436,7 +470,10 @@
         const isT = (i === idx);
 
         el.classList.toggle("target", isT);
+
+        // IMPORTANT: remove prize classes from everyone every time
         el.classList.remove("target-none","target-miso","target-half","target-katsu");
+
         if(isT) el.classList.add(p.cls);
 
         const size = isT ? cfg.targetSize : cfg.decoySize;
@@ -461,16 +498,6 @@
 
         targetIndex = next;
         applyTarget(targetIndex, phase);
-
-        if(phase === "HARD"){
-          const moves = Math.floor(rand(2, 5));
-          for(let i=0;i<moves;i++){
-            const j = Math.floor(Math.random() * petals.length);
-            const isTarget = (j === targetIndex);
-            placePetal(petals[j], isTarget ? cfg.targetSize : cfg.decoySize);
-          }
-        }
-
         scheduleTargetSwitch();
       }, cfg.switchMs);
     }
@@ -480,8 +507,8 @@
       switchTimer = null;
 
       const cfg = PHASE_SETTINGS[phase];
-
       clearField();
+
       for(let i=0;i<cfg.petals;i++){
         const el = createPetal();
         petals.push(el);
@@ -501,7 +528,6 @@
       applyTarget(targetIndex, phase);
 
       petals.forEach((el, idx) => el.onclick = (e) => handleTap(e, idx));
-
       scheduleTargetSwitch();
     }
 
@@ -520,11 +546,6 @@
 
         el._x += el._vx;
         el._y += el._vy;
-
-        if(phase === "HARD"){
-          el._x += rand(-0.35, 0.35);
-          el._y += rand(-0.25, 0.25);
-        }
 
         if(el._x < pad){ el._x = pad; el._vx *= -1; }
         if(el._x > w - pad - size){ el._x = w - pad - size; el._vx *= -1; }
@@ -565,7 +586,6 @@
       spawnSpark(x, y, true);
       setScore(score + 1);
 
-      // instant swap after correct tap in MED/HARD
       if(phase !== "EASY"){
         let next = Math.floor(Math.random() * petals.length);
         if(next === targetIndex && petals.length > 1) next = (next + 1) % petals.length;
@@ -580,8 +600,7 @@
       overlay.classList.add("hidden");
 
       setScore(0);
-      remaining = GAME_SECONDS;
-      setTime(remaining);
+      setTime(GAME_SECONDS);
 
       startTs = performance.now();
       lastTapAt = 0;
@@ -594,7 +613,7 @@
         const now = performance.now();
         const elapsed = (now - startTs) / 1000;
 
-        remaining = clamp(GAME_SECONDS - elapsed, 0, GAME_SECONDS);
+        const remaining = clamp(GAME_SECONDS - elapsed, 0, GAME_SECONDS);
         setTime(remaining);
 
         movePetals();
